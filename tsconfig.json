@@ -31,9 +31,10 @@
       "@types/*": ["./src/types/*"],
       "@store/*": ["./src/store/*"],
       "@services/*": ["./src/services/*"],
-      "@assets/*": ["./src/assets/*"]
+      "@assets/*": ["./src/assets/*"],
+      "@config/*": ["./src/config/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "src/vite-env.d.ts", "src/types/firebase.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

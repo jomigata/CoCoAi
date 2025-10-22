@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
 import { Eye, EyeOff, Mail, Lock, Loader } from 'lucide-react';
-import toast from 'react-hot-toast';
 
 const LoginPage: React.FC = () => {
   const { login, loginWithGoogle, loginWithFacebook, loading } = useAuth();
