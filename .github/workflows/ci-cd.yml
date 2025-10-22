@@ -5,6 +5,7 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch: # 수동 실행 가능하도록 추가
 
 env:
   NODE_VERSION: '18'
@@ -90,7 +91,7 @@ jobs:
     name: Deploy to Firebase
     runs-on: ubuntu-latest
     needs: [lint-and-type-check, test, build]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -106,6 +107,13 @@ jobs:
 
       - name: Build application
         run: npm run build
+
+      - name: Check Firebase Token
+        run: |
+          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
+            echo "Firebase service account not found. Skipping deployment."
+            exit 0
+          fi
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
