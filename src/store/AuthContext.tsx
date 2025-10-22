@@ -68,7 +68,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await signInWithEmailAndPassword(auth, email, password);
       toast.success('로그인되었습니다.');
     } catch (error: any) {
-      console.error('로그인 오류:', error);
       toast.error(getErrorMessage(error.code));
       throw error;
     } finally {
@@ -101,7 +100,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       toast.success('회원가입이 완료되었습니다.');
     } catch (error: any) {
-      console.error('회원가입 오류:', error);
       toast.error(getErrorMessage(error.code));
       throw error;
     } finally {
@@ -114,7 +112,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await signOut(auth);
       toast.success('로그아웃되었습니다.');
     } catch (error: any) {
-      console.error('로그아웃 오류:', error);
       toast.error('로그아웃 중 오류가 발생했습니다.');
       throw error;
     }
@@ -125,7 +122,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await sendPasswordResetEmail(auth, email);
       toast.success('비밀번호 재설정 이메일을 발송했습니다.');
     } catch (error: any) {
-      console.error('비밀번호 재설정 오류:', error);
       toast.error(getErrorMessage(error.code));
       throw error;
     }
@@ -153,7 +149,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       toast.success('Google 로그인이 완료되었습니다.');
     } catch (error: any) {
-      console.error('Google 로그인 오류:', error);
       toast.error(getErrorMessage(error.code));
       throw error;
     } finally {
@@ -183,7 +178,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       toast.success('Facebook 로그인이 완료되었습니다.');
     } catch (error: any) {
-      console.error('Facebook 로그인 오류:', error);
       toast.error(getErrorMessage(error.code));
       throw error;
     } finally {
@@ -205,7 +199,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       toast.success('프로필이 업데이트되었습니다.');
     } catch (error: any) {
-      console.error('프로필 업데이트 오류:', error);
       toast.error('프로필 업데이트 중 오류가 발생했습니다.');
       throw error;
     }

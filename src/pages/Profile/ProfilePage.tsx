@@ -27,7 +27,7 @@ const ProfilePage: React.FC = () => {
       });
       setIsEditing(false);
     } catch (error) {
-      console.error('프로필 업데이트 오류:', error);
+      // 프로필 업데이트 오류 처리
     }
   };
 

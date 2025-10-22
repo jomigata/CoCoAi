@@ -45,7 +45,7 @@ const RegisterPage: React.FC = () => {
       await register(formData.email, formData.password, formData.displayName, formData.role);
       navigate('/dashboard');
     } catch (error) {
-      console.error('회원가입 오류:', error);
+      // 회원가입 오류 처리
     } finally {
       setIsSubmitting(false);
     }
@@ -56,7 +56,7 @@ const RegisterPage: React.FC = () => {
       await loginWithGoogle();
       navigate('/dashboard');
     } catch (error) {
-      console.error('Google 로그인 오류:', error);
+      // Google 로그인 오류 처리
     }
   };
 
@@ -65,7 +65,7 @@ const RegisterPage: React.FC = () => {
       await loginWithFacebook();
       navigate('/dashboard');
     } catch (error) {
-      console.error('Facebook 로그인 오류:', error);
+      // Facebook 로그인 오류 처리
     }
   };
 

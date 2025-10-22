@@ -29,7 +29,7 @@ const LoginPage: React.FC = () => {
       await login(formData.email, formData.password);
       navigate('/dashboard');
     } catch (error) {
-      console.error('로그인 오류:', error);
+      // 로그인 오류 처리
     } finally {
       setIsSubmitting(false);
     }
@@ -40,7 +40,7 @@ const LoginPage: React.FC = () => {
       await loginWithGoogle();
       navigate('/dashboard');
     } catch (error) {
-      console.error('Google 로그인 오류:', error);
+      // Google 로그인 오류 처리
     }
   };
 
@@ -49,7 +49,7 @@ const LoginPage: React.FC = () => {
       await loginWithFacebook();
       navigate('/dashboard');
     } catch (error) {
-      console.error('Facebook 로그인 오류:', error);
+      // Facebook 로그인 오류 처리
     }
   };
 

@@ -13,7 +13,7 @@ const Header: React.FC = () => {
       await logout();
       navigate('/');
     } catch (error) {
-      console.error('로그아웃 오류:', error);
+      // 로그아웃 오류 처리
     }
   };
 
