@@ -1,0 +1,138 @@
+[
+  {
+    "collectionGroup": "messages",
+    "queryScope": "COLLECTION",
+    "fields": [
+      {
+        "fieldPath": "sessionId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      }
+    ]
+  },
+  {
+    "collectionGroup": "sessions",
+    "queryScope": "COLLECTION",
+    "fields": [
+      {
+        "fieldPath": "clientId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      }
+    ]
+  },
+  {
+    "collectionGroup": "sessions",
+    "queryScope": "COLLECTION",
+    "fields": [
+      {
+        "fieldPath": "counselorId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      }
+    ]
+  },
+  {
+    "collectionGroup": "testResults",
+    "queryScope": "COLLECTION",
+    "fields": [
+      {
+        "fieldPath": "userId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "testType",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      }
+    ]
+  },
+  {
+    "collectionGroup": "appointments",
+    "queryScope": "COLLECTION",
+    "fields": [
+      {
+        "fieldPath": "clientId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "date",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "time",
+        "order": "ASCENDING"
+      }
+    ]
+  },
+  {
+    "collectionGroup": "appointments",
+    "queryScope": "COLLECTION",
+    "fields": [
+      {
+        "fieldPath": "counselorId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "date",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "time",
+        "order": "ASCENDING"
+      }
+    ]
+  },
+  {
+    "collectionGroup": "reviews",
+    "queryScope": "COLLECTION",
+    "fields": [
+      {
+        "fieldPath": "counselorId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "rating",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      }
+    ]
+  },
+  {
+    "collectionGroup": "chatSessions",
+    "queryScope": "COLLECTION",
+    "fields": [
+      {
+        "fieldPath": "userId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      }
+    ]
+  }
+]

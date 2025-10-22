@@ -1,0 +1,97 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 사용자 문서 규칙
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && 
+        (resource.data.role == 'counselor' || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'counselor');
+    }
+
+    // 상담 세션 규칙
+    match /sessions/{sessionId} {
+      allow read, write: if request.auth != null && 
+        (resource.data.clientId == request.auth.uid || 
+         resource.data.counselorId == request.auth.uid);
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.clientId;
+    }
+
+    // 상담 메시지 규칙
+    match /messages/{messageId} {
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/sessions/$(resource.data.sessionId)) &&
+        (get(/databases/$(database)/documents/sessions/$(resource.data.sessionId)).data.clientId == request.auth.uid ||
+         get(/databases/$(database)/documents/sessions/$(resource.data.sessionId)).data.counselorId == request.auth.uid);
+    }
+
+    // 심리 테스트 결과 규칙
+    match /testResults/{resultId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'counselor';
+    }
+
+    // AI 챗봇 대화 규칙
+    match /chatSessions/{sessionId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+    }
+
+    // 공지사항 규칙
+    match /notices/{noticeId} {
+      allow read: if true; // 모든 사용자가 읽기 가능
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // FAQ 규칙
+    match /faqs/{faqId} {
+      allow read: if true; // 모든 사용자가 읽기 가능
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // 상담사 프로필 규칙
+    match /counselorProfiles/{profileId} {
+      allow read: if true; // 모든 사용자가 읽기 가능
+      allow write: if request.auth != null && 
+        request.auth.uid == profileId &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'counselor';
+    }
+
+    // 리뷰 및 평점 규칙
+    match /reviews/{reviewId} {
+      allow read: if true; // 모든 사용자가 읽기 가능
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+    }
+
+    // 예약 규칙
+    match /appointments/{appointmentId} {
+      allow read, write: if request.auth != null && 
+        (resource.data.clientId == request.auth.uid || 
+         resource.data.counselorId == request.auth.uid);
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.clientId;
+    }
+
+    // 결제 정보 규칙
+    match /payments/{paymentId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+    }
+
+    // 시스템 설정 규칙
+    match /settings/{settingId} {
+      allow read: if true; // 모든 사용자가 읽기 가능
+      allow write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}

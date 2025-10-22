@@ -1,0 +1,64 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // 사용자 프로필 이미지
+    match /users/{userId}/profile/{fileName} {
+      allow read: if true; // 모든 사용자가 읽기 가능
+      allow write: if request.auth != null && request.auth.uid == userId &&
+        fileName.matches('.*\\.(jpg|jpeg|png|gif|webp)$') &&
+        request.resource.size < 5 * 1024 * 1024; // 5MB 제한
+    }
+
+    // 상담 세션 첨부 파일
+    match /sessions/{sessionId}/attachments/{fileName} {
+      allow read, write: if request.auth != null && 
+        exists(/databases/(default)/documents/sessions/$(sessionId)) &&
+        (get(/databases/(default)/documents/sessions/$(sessionId)).data.clientId == request.auth.uid ||
+         get(/databases/(default)/documents/sessions/$(sessionId)).data.counselorId == request.auth.uid) &&
+        fileName.matches('.*\\.(pdf|doc|docx|txt|jpg|jpeg|png|gif|webp)$') &&
+        request.resource.size < 10 * 1024 * 1024; // 10MB 제한
+    }
+
+    // 상담사 자격 증명서
+    match /counselors/{counselorId}/certificates/{fileName} {
+      allow read: if request.auth != null && 
+        get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'counselor';
+      allow write: if request.auth != null && 
+        request.auth.uid == counselorId &&
+        get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'counselor' &&
+        fileName.matches('.*\\.(pdf|jpg|jpeg|png)$') &&
+        request.resource.size < 5 * 1024 * 1024; // 5MB 제한
+    }
+
+    // 공지사항 첨부 파일
+    match /notices/{noticeId}/attachments/{fileName} {
+      allow read: if true; // 모든 사용자가 읽기 가능
+      allow write: if request.auth != null && 
+        get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin' &&
+        fileName.matches('.*\\.(pdf|doc|docx|txt|jpg|jpeg|png|gif|webp)$') &&
+        request.resource.size < 10 * 1024 * 1024; // 10MB 제한
+    }
+
+    // 임시 파일 (24시간 후 자동 삭제)
+    match /temp/{userId}/{fileName} {
+      allow read, write: if request.auth != null && request.auth.uid == userId &&
+        fileName.matches('.*\\.(jpg|jpeg|png|gif|webp|pdf|doc|docx|txt)$') &&
+        request.resource.size < 5 * 1024 * 1024; // 5MB 제한
+    }
+
+    // 시스템 파일 (관리자만 접근)
+    match /system/{fileName} {
+      allow read: if request.auth != null && 
+        get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow write: if request.auth != null && 
+        get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // 백업 파일 (관리자만 접근)
+    match /backups/{fileName} {
+      allow read, write: if request.auth != null && 
+        get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}
