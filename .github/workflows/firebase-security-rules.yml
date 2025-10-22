@@ -38,7 +38,7 @@ jobs:
       - name: Deploy Firestore Security Rules
         run: |
           if [ -n "${{ secrets.FIREBASE_TOKEN }}" ]; then
-            firebase deploy --only firestore:rules --project wiz-coco
+            firebase deploy --only firestore:rules --project cocoai-60a2d
           else
             echo "Skipping Firestore rules deployment - no token"
           fi
@@ -48,7 +48,7 @@ jobs:
       - name: Deploy Storage Security Rules
         run: |
           if [ -n "${{ secrets.FIREBASE_TOKEN }}" ]; then
-            firebase deploy --only storage --project wiz-coco
+            firebase deploy --only storage --project cocoai-60a2d
           else
             echo "Skipping Storage rules deployment - no token"
           fi
