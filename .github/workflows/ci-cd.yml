@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ] # develop 브랜치 제거로 사용량 절약
   pull_request:
     branches: [ main ]
   workflow_dispatch: # 수동 실행 가능하도록 추가
@@ -150,10 +150,11 @@ jobs:
         with:
           args: --severity-threshold=high
 
-  # 성능 테스트
+  # 성능 테스트 (선택적 실행 - 사용량 절약)
   performance-test:
     name: Performance Test
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' # 수동 실행시에만
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
