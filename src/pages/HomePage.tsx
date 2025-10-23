@@ -16,6 +16,9 @@ const HomePage: React.FC = () => {
             <span className="block text-2xl md:text-4xl text-pink-500 mt-2">
               - CoCo Ai 심리 케어 플랫폼
             </span>
+            <span className="block text-sm text-green-600 dark:text-green-400 mt-4 font-normal">
+              🚀 자동 배포 테스트 완료 - {new Date().toLocaleString('ko-KR')}
+            </span>
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             AI 기반 심리 케어 플랫폼으로 마음의 건강을 돌보세요. 
