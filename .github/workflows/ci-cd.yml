@@ -44,21 +44,42 @@ jobs:
           name: build-files
           path: dist/
 
-  # Firebase 자동 배포 비활성화 - 수동 배포로 전환
+  # Firebase 자동 배포 재활성화 - 안정적인 방식
   deploy:
-    name: Deploy to Firebase (Manual Only)
+    name: Deploy to Firebase
     runs-on: ubuntu-latest
     needs: [build-and-test]
-    if: false  # 자동 배포 완전 비활성화
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'  # main 브랜치 push시에만 자동 배포
     steps:
-      - name: Manual Deployment Notice
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+          path: dist/
+
+      - name: Verify build artifacts
         run: |
-          echo "🚨 Firebase 자동 배포가 비활성화되었습니다."
-          echo "📋 수동 배포 방법:"
-          echo "1. 로컬에서 'firebase login' 실행"
-          echo "2. 'firebase use cocoai-60a2d' 실행"
-          echo "3. 'firebase deploy --only hosting' 실행"
-          echo "또는 프로젝트 루트에서 './deploy.bat' (Windows) 또는 './deploy.sh' (Linux/Mac) 실행"
+          echo "📦 빌드 아티팩트 확인 중..."
+          ls -la dist/
+          if [ ! -f "dist/index.html" ]; then
+            echo "❌ 빌드 아티팩트가 올바르지 않습니다."
+            exit 1
+          fi
+          echo "✅ 빌드 아티팩트 확인 완료"
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          channelId: live
+          entryPoint: .
+        env:
+          FIREBASE_CLI_EXPERIMENTS: webframeworks
 
   # 보안 스캔 (수동 실행만 - 사용량 절약)
   security-scan:
