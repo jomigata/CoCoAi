@@ -9,7 +9,11 @@ import {
   Settings,
   Calendar,
   FileText,
-  Users
+  Users,
+  Brain,
+  Heart,
+  Bot,
+  TestTube
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
@@ -18,8 +22,12 @@ const Sidebar: React.FC = () => {
 
   const navigationItems = [
     { name: '홈', href: '/', icon: Home },
-    { name: '상담', href: '/counseling', icon: MessageCircle },
     { name: '대시보드', href: '/dashboard', icon: BarChart3 },
+    { name: '마음 기록', href: '/mood', icon: Heart },
+    { name: '그룹', href: '/groups', icon: Users },
+    { name: '코코 챗봇', href: '/chat', icon: Bot },
+    { name: '프로파일링', href: '/profiling', icon: Brain },
+    { name: '상담', href: '/counseling', icon: MessageCircle },
     { name: '프로필', href: '/profile', icon: User },
   ];
 

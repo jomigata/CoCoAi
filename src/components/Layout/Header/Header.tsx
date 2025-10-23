@@ -40,16 +40,28 @@ const Header: React.FC = () => {
               홈
             </Link>
             <Link
-              to="/counseling"
-              className="text-gray-700 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
-            >
-              상담
-            </Link>
-            <Link
               to="/dashboard"
               className="text-gray-700 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
             >
               대시보드
+            </Link>
+            <Link
+              to="/mood"
+              className="text-gray-700 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+            >
+              마음 기록
+            </Link>
+            <Link
+              to="/groups"
+              className="text-gray-700 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+            >
+              그룹
+            </Link>
+            <Link
+              to="/chat"
+              className="text-gray-700 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+            >
+              코코 챗봇
             </Link>
           </nav>
 

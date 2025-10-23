@@ -11,12 +11,21 @@ import CounselingPage from '@pages/Counseling/CounselingPage';
 import ProfilePage from '@pages/Profile/ProfilePage';
 import NotFoundPage from '@pages/NotFoundPage';
 
+// 새로운 페이지들
+import PersonalProfilingPage from '@pages/Profiling/PersonalProfilingPage';
+import ProfilingResultsPage from '@pages/Profiling/ProfilingResultsPage';
+import GroupsPage from '@pages/Groups/GroupsPage';
+import CreateGroupPage from '@pages/Groups/CreateGroupPage';
+import DailyMoodPage from '@pages/Mood/DailyMoodPage';
+import ChatPage from '@pages/Chat/ChatPage';
+
 // 컨텍스트 임포트
 import { AuthProvider } from '@store/AuthContext';
 import { ThemeProvider } from '@store/ThemeContext';
 
 // 스타일 임포트
 import './index.css';
+import './styles/design-system.css';
 
 function App() {
   return (
@@ -35,6 +44,14 @@ function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/counseling" element={<CounselingPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                
+                {/* 새로운 기능 라우트 */}
+                <Route path="/profiling" element={<PersonalProfilingPage />} />
+                <Route path="/profile/results" element={<ProfilingResultsPage />} />
+                <Route path="/groups" element={<GroupsPage />} />
+                <Route path="/groups/create" element={<CreateGroupPage />} />
+                <Route path="/mood" element={<DailyMoodPage />} />
+                <Route path="/chat" element={<ChatPage />} />
                 
                 {/* 404 페이지 */}
                 <Route path="*" element={<NotFoundPage />} />
