@@ -3,12 +3,6 @@ import { useAuth } from '@store/AuthContext';
 import { 
   collection, 
   addDoc, 
-  query, 
-  where, 
-  orderBy, 
-  onSnapshot,
-  doc,
-  updateDoc,
   serverTimestamp
 } from 'firebase/firestore';
 import { db } from '@config/firebase';
@@ -18,16 +12,12 @@ import {
   Bot,
   User,
   Heart,
-  Lightbulb,
-  MessageCircle,
   RefreshCw,
   Settings,
   HelpCircle,
   Smile,
   Brain,
-  AlertTriangle,
-  Clock,
-  CheckCircle
+  AlertTriangle
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -42,21 +32,7 @@ interface ChatMessage {
   };
 }
 
-interface ChatSession {
-  id: string;
-  userId: string;
-  title: string;
-  messages: ChatMessage[];
-  context: {
-    currentMood?: string;
-    recentTestResults?: string[];
-    groupContext?: string;
-    conversationGoal?: string;
-  };
-  status: 'active' | 'completed' | 'archived';
-  lastMessageAt: Date;
-  createdAt: Date;
-}
+// ChatSession 인터페이스는 향후 세션 관리 기능에서 사용될 예정
 
 const ChatPage: React.FC = () => {
   const { user } = useAuth();
@@ -186,7 +162,7 @@ const ChatPage: React.FC = () => {
   };
 
   const generateCocoResponse = (userMessage: string, analysis: any): string => {
-    const { supportType, emotion, intent } = analysis;
+    const { supportType, emotion } = analysis;
 
     // 특정 키워드에 대한 맞춤 응답
     if (userMessage.includes('프로파일링') || userMessage.includes('검사')) {

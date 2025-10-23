@@ -12,8 +12,7 @@ import {
   Users,
   Brain,
   Heart,
-  Bot,
-  TestTube
+  Bot
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {

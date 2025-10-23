@@ -358,7 +358,7 @@ const PersonalProfilingPage: React.FC = () => {
           </div>
         );
 
-      case 'multiple-choice':
+      case 'multiple-choice': {
         const isMultiSelect = question.question.includes('복수 선택') || question.question.includes('최대');
         const maxSelections = question.question.includes('최대 5개') ? 5 : 
                              question.question.includes('최대 7개') ? 7 : 
@@ -417,6 +417,7 @@ const PersonalProfilingPage: React.FC = () => {
             })}
           </div>
         );
+      }
 
       default:
         return null;

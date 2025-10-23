@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
-import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 import { db } from '@config/firebase';
 import toast from 'react-hot-toast';
 import { 
@@ -12,7 +12,6 @@ import {
   Briefcase,
   Settings,
   Plus,
-  X,
   CheckCircle,
   AlertTriangle
 } from 'lucide-react';

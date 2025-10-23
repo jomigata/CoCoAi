@@ -6,8 +6,6 @@ import {
   query, 
   where, 
   getDocs, 
-  doc, 
-  getDoc,
   orderBy 
 } from 'firebase/firestore';
 import { db } from '@config/firebase';
@@ -141,7 +139,12 @@ const GroupsPage: React.FC = () => {
         if (new Date(invitationData.expiresAt.toDate()) > new Date()) {
           userInvitations.push({
             id: docSnap.id,
-            ...invitationData,
+            groupId: invitationData.groupId,
+            invitedBy: invitationData.invitedBy,
+            invitedEmail: invitationData.invitedEmail,
+            invitedUserId: invitationData.invitedUserId,
+            status: invitationData.status,
+            message: invitationData.message,
             createdAt: invitationData.createdAt.toDate(),
             expiresAt: invitationData.expiresAt.toDate(),
             respondedAt: invitationData.respondedAt?.toDate()
@@ -195,12 +198,12 @@ const GroupsPage: React.FC = () => {
     }
   };
 
-  const handleAcceptInvitation = async (invitationId: string) => {
+  const handleAcceptInvitation = async () => {
     // 초대 수락 로직 (추후 구현)
     toast.success('초대를 수락했습니다.');
   };
 
-  const handleDeclineInvitation = async (invitationId: string) => {
+  const handleDeclineInvitation = async () => {
     // 초대 거절 로직 (추후 구현)
     toast.success('초대를 거절했습니다.');
   };
@@ -437,13 +440,13 @@ const GroupsPage: React.FC = () => {
                       
                       <div className="flex gap-2 ml-4">
                         <button
-                          onClick={() => handleAcceptInvitation(invitation.id)}
+                          onClick={() => handleAcceptInvitation()}
                           className="btn-success px-4 py-2 text-sm"
                         >
                           수락
                         </button>
                         <button
-                          onClick={() => handleDeclineInvitation(invitation.id)}
+                          onClick={() => handleDeclineInvitation()}
                           className="btn-secondary px-4 py-2 text-sm"
                         >
                           거절

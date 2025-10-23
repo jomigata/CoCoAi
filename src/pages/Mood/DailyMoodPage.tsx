@@ -18,8 +18,6 @@ import {
   Calendar,
   Heart,
   Smile,
-  Frown,
-  Angry,
   Zap,
   Coffee,
   CloudRain,
@@ -31,8 +29,7 @@ import {
   Save,
   TrendingUp,
   Clock,
-  AlertTriangle,
-  CheckCircle
+  AlertTriangle
 } from 'lucide-react';
 
 interface MoodRecord {
@@ -213,17 +210,7 @@ const DailyMoodPage: React.FC = () => {
     }));
   };
 
-  const handleSecondaryMoodToggle = (tag: string) => {
-    setCurrentRecord(prev => ({
-      ...prev,
-      mood: {
-        ...prev.mood!,
-        secondary: prev.mood!.secondary?.includes(tag)
-          ? prev.mood!.secondary.filter(t => t !== tag)
-          : [...(prev.mood!.secondary || []), tag]
-      }
-    }));
-  };
+  // handleSecondaryMoodToggle 함수는 향후 부가 감정 선택 기능에서 사용될 예정
 
   const handleRecordTypeChange = (type: 'emoji' | 'tags' | 'text' | 'voice') => {
     setCurrentRecord(prev => ({
@@ -609,8 +596,8 @@ const DailyMoodPage: React.FC = () => {
                           onChange={(e) => setCurrentRecord(prev => ({
                             ...prev,
                             sleep: {
-                              ...prev.sleep,
-                              hours: parseFloat(e.target.value)
+                              hours: parseFloat(e.target.value),
+                              quality: prev.sleep?.quality || 7
                             }
                           }))}
                           className="input-field"
@@ -628,7 +615,7 @@ const DailyMoodPage: React.FC = () => {
                           onChange={(e) => setCurrentRecord(prev => ({
                             ...prev,
                             sleep: {
-                              ...prev.sleep,
+                              hours: prev.sleep?.hours || 8,
                               quality: parseInt(e.target.value)
                             }
                           }))}
