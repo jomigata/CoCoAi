@@ -82,7 +82,7 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
 
       - name: Deploy to Firebase Hosting
-        run: firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }}
+        run: firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --debug
         env:
           GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
 
