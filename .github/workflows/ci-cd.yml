@@ -93,9 +93,15 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
 
+      - name: Set Firebase Project
+        run: |
+          firebase use ${{ env.FIREBASE_PROJECT_ID }} --non-interactive
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
+
       - name: Deploy to Firebase Hosting
         run: |
-          firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive --debug
+          firebase deploy --only hosting --non-interactive --debug
         env:
           GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
 
