@@ -9,9 +9,9 @@ import { getPerformance } from 'firebase/performance';
 // Firebase 설정 객체
 const firebaseConfig = {
   apiKey: "AIzaSyAIq3ePshbPFsUDwEEmtWrM14icGOmrmQQ",
-  authDomain: "cocoai-60a2d.firebaseapp.com",
-  projectId: "cocoai-60a2d",
-  storageBucket: "cocoai-60a2d.firebasestorage.app",
+  authDomain: "wiz-coco.firebaseapp.com",
+  projectId: "wiz-coco",
+  storageBucket: "wiz-coco.firebasestorage.app",
   messagingSenderId: "589508812163",
   appId: "1:589508812163:web:36a28d29be8c3777fa6ab6",
   measurementId: "G-DDNRP7SK9S"
