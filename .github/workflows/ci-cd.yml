@@ -78,17 +78,24 @@ jobs:
 
       - name: Setup Firebase CLI
         run: |
-          npm install -g firebase-tools
+          npm install -g firebase-tools@latest
           firebase --version
 
       - name: Create Firebase Service Account Key
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-service-account.json
-          cat firebase-service-account.json | head -5
+          echo "Service Account Key created successfully"
+          ls -la firebase-service-account.json
+
+      - name: Verify Firebase Project Access
+        run: |
+          firebase projects:list --json
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
 
       - name: Deploy to Firebase Hosting
         run: |
-          firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive
+          firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive --debug
         env:
           GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
 
