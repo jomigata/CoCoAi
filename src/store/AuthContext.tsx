@@ -220,7 +220,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       if (error.code === 'auth/popup-blocked') {
         // 팝업이 차단된 경우 리다이렉트로 재시도
-        toast.info('팝업이 차단되었습니다. 리다이렉트 방식으로 로그인합니다.');
+        toast('팝업이 차단되었습니다. 리다이렉트 방식으로 로그인합니다.', {
+          icon: 'ℹ️',
+          duration: 4000,
+        });
         return loginWithGoogle(true);
       }
       toast.error(getErrorMessage(error.code));
@@ -267,7 +270,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       if (error.code === 'auth/popup-blocked') {
         // 팝업이 차단된 경우 리다이렉트로 재시도
-        toast.info('팝업이 차단되었습니다. 리다이렉트 방식으로 로그인합니다.');
+        toast('팝업이 차단되었습니다. 리다이렉트 방식으로 로그인합니다.', {
+          icon: 'ℹ️',
+          duration: 4000,
+        });
         return loginWithFacebook(true);
       }
       toast.error(getErrorMessage(error.code));
