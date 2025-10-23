@@ -44,7 +44,7 @@ jobs:
           name: build-files
           path: dist/
 
-  # Firebase 자동 배포 재활성화 - 안정적인 방식
+  # Firebase 자동 배포 - GitHub Token 방식 (권한 문제 해결)
   deploy:
     name: Deploy to Firebase
     runs-on: ubuntu-latest
@@ -54,11 +54,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: build-files
-          path: dist/
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
 
       - name: Verify build artifacts
         run: |
@@ -70,16 +76,21 @@ jobs:
           fi
           echo "✅ 빌드 아티팩트 확인 완료"
 
-      - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-          projectId: ${{ env.FIREBASE_PROJECT_ID }}
-          channelId: live
-          entryPoint: .
-        env:
-          FIREBASE_CLI_EXPERIMENTS: webframeworks
+      - name: Setup Firebase CLI
+        run: |
+          npm install -g firebase-tools@latest
+          firebase --version
+
+      - name: Deploy to Firebase Hosting (Token 방식)
+        run: |
+          if [ -n "${{ secrets.FIREBASE_TOKEN }}" ]; then
+            echo "🔑 Firebase Token을 사용한 배포 시작..."
+            firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --token "${{ secrets.FIREBASE_TOKEN }}" --non-interactive
+          else
+            echo "❌ FIREBASE_TOKEN이 설정되지 않았습니다."
+            echo "💡 Firebase CLI에서 'firebase login:ci' 명령어로 토큰을 생성하고 GitHub Secrets에 추가해주세요."
+            exit 1
+          fi
 
   # 보안 스캔 (수동 실행만 - 사용량 절약)
   security-scan:
