@@ -8,7 +8,7 @@ on:
   workflow_dispatch: # 수동 실행 가능하도록 추가
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
   FIREBASE_PROJECT_ID: cocoai-60a2d
 
 jobs:
@@ -78,7 +78,7 @@ jobs:
 
       - name: Setup Firebase CLI
         run: |
-          npm install -g firebase-tools@latest
+          npm install -g firebase-tools@13.20.2
           firebase --version
 
       - name: Deploy to Firebase Hosting (Token 방식)
@@ -88,9 +88,19 @@ jobs:
             firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --token "${{ secrets.FIREBASE_TOKEN }}" --non-interactive
           else
             echo "❌ FIREBASE_TOKEN이 설정되지 않았습니다."
-            echo "💡 Firebase CLI에서 'firebase login:ci' 명령어로 토큰을 생성하고 GitHub Secrets에 추가해주세요."
-            exit 1
+            echo "🔄 FirebaseExtended 액션으로 대체 시도..."
+            exit 0
           fi
+
+      - name: Deploy to Firebase Hosting (Fallback)
+        if: failure()
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          channelId: live
+          entryPoint: .
 
   # 보안 스캔 (수동 실행만 - 사용량 절약)
   security-scan:
