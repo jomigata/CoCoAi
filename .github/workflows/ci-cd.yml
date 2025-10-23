@@ -44,66 +44,21 @@ jobs:
           name: build-files
           path: dist/
 
-  # Firebase 자동 배포 활성화
+  # Firebase 자동 배포 비활성화 - 수동 배포로 전환
   deploy:
-    name: Deploy to Firebase
+    name: Deploy to Firebase (Manual Only)
     runs-on: ubuntu-latest
     needs: [build-and-test]
-    if: github.ref == 'refs/heads/main'  # main 브랜치에만 자동 배포
+    if: false  # 자동 배포 완전 비활성화
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build application
-        run: npm run build
-
-      - name: Check Firebase Service Account
+      - name: Manual Deployment Notice
         run: |
-          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
-            echo "❌ FIREBASE_SERVICE_ACCOUNT secret이 설정되지 않았습니다."
-            echo "GitHub Repository Settings > Secrets and variables > Actions에서 설정해주세요."
-            exit 1
-          else
-            echo "✅ Firebase Service Account 설정 확인됨"
-          fi
-
-      - name: Setup Firebase CLI
-        run: |
-          npm install -g firebase-tools@latest
-          firebase --version
-
-      - name: Create Firebase Service Account Key
-        run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > firebase-service-account.json
-          echo "Service Account Key created successfully"
-          ls -la firebase-service-account.json
-
-      - name: Verify Firebase Project Access
-        run: |
-          firebase projects:list --json
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
-
-      - name: Set Firebase Project
-        run: |
-          firebase use ${{ env.FIREBASE_PROJECT_ID }} --non-interactive
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
-
-      - name: Deploy to Firebase Hosting
-        run: |
-          firebase deploy --only hosting --non-interactive --debug
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
+          echo "🚨 Firebase 자동 배포가 비활성화되었습니다."
+          echo "📋 수동 배포 방법:"
+          echo "1. 로컬에서 'firebase login' 실행"
+          echo "2. 'firebase use cocoai-60a2d' 실행"
+          echo "3. 'firebase deploy --only hosting' 실행"
+          echo "또는 프로젝트 루트에서 './deploy.bat' (Windows) 또는 './deploy.sh' (Linux/Mac) 실행"
 
   # 보안 스캔 (수동 실행만 - 사용량 절약)
   security-scan:
