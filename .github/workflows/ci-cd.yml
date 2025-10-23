@@ -44,12 +44,12 @@ jobs:
           name: build-files
           path: dist/
 
-  # Firebase 배포 (수동 배포로 전환 - 자동 배포 비활성화)
+  # Firebase 자동 배포 활성화
   deploy:
     name: Deploy to Firebase
     runs-on: ubuntu-latest
     needs: [build-and-test]
-    if: false  # 자동 배포 완전 비활성화 - 수동 배포로 전환
+    if: github.ref == 'refs/heads/main'  # main 브랜치에만 자동 배포
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -66,8 +66,24 @@ jobs:
       - name: Build application
         run: npm run build
 
+      - name: Check Firebase Service Account
+        run: |
+          if [ -z "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" ]; then
+            echo "❌ FIREBASE_SERVICE_ACCOUNT secret이 설정되지 않았습니다."
+            echo "GitHub Repository Settings > Secrets and variables > Actions에서 설정해주세요."
+            exit 1
+          else
+            echo "✅ Firebase Service Account 설정 확인됨"
+          fi
+
       - name: Deploy to Firebase Hosting
-        run: echo "Firebase deployment disabled - use manual deployment via Firebase CLI"
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          projectId: ${{ env.FIREBASE_PROJECT_ID }}
+          channelId: live
+          entryPoint: .
 
   # 보안 스캔 (수동 실행만 - 사용량 절약)
   security-scan:
