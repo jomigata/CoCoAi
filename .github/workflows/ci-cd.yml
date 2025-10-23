@@ -9,7 +9,7 @@ on:
 
 env:
   NODE_VERSION: '18'
-  FIREBASE_PROJECT_ID: wiz-coco
+  FIREBASE_PROJECT_ID: cocoai-60a2d
 
 jobs:
   # 통합된 코드 검사 및 빌드 (사용량 절약)
