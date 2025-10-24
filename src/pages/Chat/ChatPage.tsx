@@ -20,6 +20,10 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
+// AI 경고 시스템 import
+import AIWarning from '@components/Common/AIWarning';
+import { useChatWarning } from '@hooks/useAIWarning';
+
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -42,6 +46,9 @@ const ChatPage: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // AI 경고 시스템 Hook
+  const aiWarning = useChatWarning();
 
   // 코코 AI의 기본 응답 템플릿
   const cocoResponses = {
@@ -340,6 +347,18 @@ const ChatPage: React.FC = () => {
               <p className="text-body-medium text-gray-600 mb-6">
                 고민 상담, 앱 사용법, 심리 건강 정보 등 무엇이든 물어보세요!
               </p>
+              
+              {/* AI 경고 시스템 */}
+              <div className="mb-6">
+                <AIWarning
+                  message={aiWarning.message}
+                  details={aiWarning.details}
+                  timestamp={aiWarning.timestamp}
+                  type={aiWarning.type}
+                  showDetails={false}
+                  className="text-left max-w-2xl mx-auto"
+                />
+              </div>
               
               {/* 빠른 응답 버튼들 */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto">

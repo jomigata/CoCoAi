@@ -19,6 +19,10 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
+// AI 경고 시스템 import
+import AIWarning from '@components/Common/AIWarning';
+import { useProfilingWarning } from '@hooks/useAIWarning';
+
 interface PersonalProfile {
   ageGroup: string;
   completedAt: Date;
@@ -43,6 +47,9 @@ const ProfilingResultsPage: React.FC = () => {
   const [profile, setProfile] = useState<PersonalProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'detailed' | 'recommendations'>('overview');
+  
+  // AI 경고 시스템 Hook
+  const aiWarning = useProfilingWarning();
 
   useEffect(() => {
     loadProfile();
@@ -227,7 +234,21 @@ const ProfilingResultsPage: React.FC = () => {
           <p className="text-body-large text-gray-600 max-w-2xl mx-auto mb-6">
             당신의 고유한 심리적 특성과 성장 방향을 확인해보세요.
           </p>
-          
+        </div>
+
+        {/* AI 편향성 경고 */}
+        <div className="mb-8">
+          <AIWarning
+            message={aiWarning.message}
+            details={aiWarning.details}
+            timestamp={aiWarning.timestamp}
+            type={aiWarning.type}
+            showDetails={false}
+            className="max-w-4xl mx-auto"
+          />
+        </div>
+
+        <div className="text-center">
           {/* 액션 버튼들 */}
           <div className="flex flex-wrap justify-center gap-4">
             <button

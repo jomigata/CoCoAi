@@ -16,8 +16,15 @@ import PersonalProfilingPage from '@pages/Profiling/PersonalProfilingPage';
 import ProfilingResultsPage from '@pages/Profiling/ProfilingResultsPage';
 import GroupsPage from '@pages/Groups/GroupsPage';
 import CreateGroupPage from '@pages/Groups/CreateGroupPage';
+import GroupInvitePage from '@pages/Groups/GroupInvitePage';
+import GroupDiagnosisPage from '@pages/Groups/GroupDiagnosisPage';
+import GroupReportsPage from '@pages/Groups/GroupReportsPage';
 import DailyMoodPage from '@pages/Mood/DailyMoodPage';
 import ChatPage from '@pages/Chat/ChatPage';
+import RecommendationsPage from '@pages/Recommendations/RecommendationsPage';
+import AchievementsPage from '@pages/Achievements/AchievementsPage';
+import RelationshipGardenPage from '@pages/Garden/RelationshipGardenPage';
+import CounselorMatchingPage from '@pages/Counselor/CounselorMatchingPage';
 
 // 컨텍스트 임포트
 import { AuthProvider } from '@store/AuthContext';
@@ -50,8 +57,15 @@ function App() {
                 <Route path="/profile/results" element={<ProfilingResultsPage />} />
                 <Route path="/groups" element={<GroupsPage />} />
                 <Route path="/groups/create" element={<CreateGroupPage />} />
+                <Route path="/groups/join" element={<GroupInvitePage />} />
+                <Route path="/groups/:groupId/diagnosis" element={<GroupDiagnosisPage />} />
+                <Route path="/groups/:groupId/reports" element={<GroupReportsPage />} />
                 <Route path="/mood" element={<DailyMoodPage />} />
                 <Route path="/chat" element={<ChatPage />} />
+                <Route path="/recommendations" element={<RecommendationsPage />} />
+                <Route path="/achievements" element={<AchievementsPage />} />
+                <Route path="/garden" element={<RelationshipGardenPage />} />
+                <Route path="/counselor-matching" element={<CounselorMatchingPage />} />
                 
                 {/* 404 페이지 */}
                 <Route path="*" element={<NotFoundPage />} />

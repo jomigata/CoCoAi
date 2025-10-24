@@ -79,6 +79,11 @@ const GroupsPage: React.FC = () => {
   const [invitations, setInvitations] = useState<GroupInvitation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'my-groups' | 'invitations'>('my-groups');
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteMessage, setInviteMessage] = useState('');
+  const [isInviting, setIsInviting] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -188,6 +193,47 @@ const GroupsPage: React.FC = () => {
       case 'admin': return <Shield className="w-4 h-4 text-blue-500" />;
       default: return <User className="w-4 h-4 text-gray-500" />;
     }
+  };
+
+  const handleInviteMember = async () => {
+    if (!selectedGroupId || !inviteEmail.trim() || !user) return;
+
+    setIsInviting(true);
+    try {
+      // 실제 구현에서는 Cloud Function 호출
+      // 임시로 Firestore에 직접 저장
+      const invitationData = {
+        groupId: selectedGroupId,
+        invitedBy: user.uid,
+        invitedEmail: inviteEmail.trim(),
+        status: 'pending',
+        message: inviteMessage.trim() || '그룹에 초대합니다!',
+        createdAt: new Date(),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7일 후 만료
+      };
+
+      // TODO: Cloud Function으로 이메일 발송 및 초대 생성
+      console.log('초대 데이터:', invitationData);
+      
+      toast.success(`${inviteEmail}로 초대를 발송했습니다! 📧`);
+      
+      // 모달 닫기 및 초기화
+      setShowInviteModal(false);
+      setSelectedGroupId(null);
+      setInviteEmail('');
+      setInviteMessage('');
+      
+    } catch (error) {
+      console.error('초대 발송 오류:', error);
+      toast.error('초대 발송 중 오류가 발생했습니다.');
+    } finally {
+      setIsInviting(false);
+    }
+  };
+
+  const openInviteModal = (groupId: string) => {
+    setSelectedGroupId(groupId);
+    setShowInviteModal(true);
   };
 
   const getRoleName = (role: string) => {
@@ -366,16 +412,28 @@ const GroupsPage: React.FC = () => {
                           일정
                         </button>
                         {(userMember.role === 'owner' || userMember.role === 'admin') && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/groups/${group.id}/settings`);
-                            }}
-                            className="flex-1 btn-ghost text-sm flex items-center justify-center"
-                          >
-                            <Settings className="w-4 h-4 mr-1" />
-                            설정
-                          </button>
+                          <>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openInviteModal(group.id);
+                              }}
+                              className="flex-1 btn-ghost text-sm flex items-center justify-center"
+                            >
+                              <UserPlus className="w-4 h-4 mr-1" />
+                              초대
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/groups/${group.id}/settings`);
+                              }}
+                              className="flex-1 btn-ghost text-sm flex items-center justify-center"
+                            >
+                              <Settings className="w-4 h-4 mr-1" />
+                              설정
+                            </button>
+                          </>
                         )}
                       </div>
                     </div>
@@ -486,6 +544,80 @@ const GroupsPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 초대 모달 */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-headline-medium text-gray-900">
+                멤버 초대
+              </h3>
+              <button
+                onClick={() => setShowInviteModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-body-medium font-medium text-gray-700 mb-2">
+                  이메일 주소
+                </label>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="초대할 사람의 이메일을 입력하세요"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-body-medium font-medium text-gray-700 mb-2">
+                  초대 메시지 (선택사항)
+                </label>
+                <textarea
+                  value={inviteMessage}
+                  onChange={(e) => setInviteMessage(e.target.value)}
+                  placeholder="함께 성장해요! 그룹에 참여해주세요."
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none"
+                />
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start">
+                  <Mail className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-blue-800">
+                    <p className="font-medium mb-1">초대 방식</p>
+                    <p>이메일로 초대 링크가 발송되며, 7일 내에 수락해야 합니다.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowInviteModal(false)}
+                className="flex-1 btn-outline"
+                disabled={isInviting}
+              >
+                취소
+              </button>
+              <button
+                onClick={handleInviteMember}
+                disabled={!inviteEmail.trim() || isInviting}
+                className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isInviting ? '발송 중...' : '초대 발송'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

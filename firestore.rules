@@ -2,7 +2,7 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 사용자 문서 규칙
+    // 🔐 사용자 문서 규칙
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
       allow read: if request.auth != null && 
@@ -10,7 +10,94 @@ service cloud.firestore {
          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'counselor');
     }
 
-    // 상담 세션 규칙
+    // 🧠 개인 프로파일링 결과 규칙 (민감 정보)
+    match /profiling_results/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // 상담사는 읽기만 가능 (사용자 동의 시)
+      allow read: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'counselor' &&
+        get(/databases/$(database)/documents/users/$(userId)).data.settings.shareWithCounselor == true;
+    }
+
+    // 📊 감정 기록 규칙 (개인 데이터)
+    match /mood_records/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      match /records/{recordId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+        // 그룹 멤버는 요약 정보만 읽기 가능
+        allow read: if request.auth != null && 
+          exists(/databases/$(database)/documents/groups/$(resource.data.groupId)/members/$(request.auth.uid));
+      }
+    }
+
+    // 👥 그룹 관리 규칙
+    match /groups/{groupId} {
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid));
+      allow write: if request.auth != null && 
+        (resource.data.createdBy == request.auth.uid || 
+         get(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid)).data.role == 'admin');
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.createdBy;
+
+      // 그룹 멤버 서브컬렉션
+      match /members/{memberId} {
+        allow read: if request.auth != null && 
+          exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid));
+        allow write: if request.auth != null && 
+          (get(/databases/$(database)/documents/groups/$(groupId)).data.createdBy == request.auth.uid ||
+           get(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid)).data.role == 'admin');
+        allow create: if request.auth != null && 
+          (request.auth.uid == memberId || 
+           get(/databases/$(database)/documents/groups/$(groupId)).data.createdBy == request.auth.uid);
+      }
+    }
+
+    // 📈 그룹 리포트 규칙
+    match /group_reports/{groupId} {
+      match /reports/{reportId} {
+        allow read: if request.auth != null && 
+          exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid));
+        allow write: if false; // 시스템에서만 생성
+      }
+    }
+
+    // 💬 AI 챗봇 세션 규칙
+    match /chat_sessions/{sessionId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      
+      match /messages/{messageId} {
+        allow read, write: if request.auth != null && 
+          request.auth.uid == get(/databases/$(database)/documents/chat_sessions/$(sessionId)).data.userId;
+      }
+    }
+
+    // 📧 그룹 초대 규칙
+    match /invitations/{invitationId} {
+      allow read: if request.auth != null && 
+        (request.auth.uid == resource.data.inviterUid || 
+         request.auth.email == resource.data.inviteeEmail);
+      allow write: if request.auth != null && 
+        request.auth.uid == resource.data.inviterUid;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.inviterUid;
+      allow update: if request.auth != null && 
+        request.auth.email == resource.data.inviteeEmail &&
+        request.resource.data.status in ['accepted', 'declined'];
+    }
+
+    // 📊 감정 분석 리포트 규칙
+    match /mood_analytics/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      match /monthly_reports/{reportId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // 🏥 상담 세션 규칙 (기존 유지)
     match /sessions/{sessionId} {
       allow read, write: if request.auth != null && 
         (resource.data.clientId == request.auth.uid || 
@@ -19,7 +106,7 @@ service cloud.firestore {
         request.auth.uid == request.resource.data.clientId;
     }
 
-    // 상담 메시지 규칙
+    // 💬 상담 메시지 규칙 (기존 유지)
     match /messages/{messageId} {
       allow read, write: if request.auth != null && 
         exists(/databases/$(database)/documents/sessions/$(resource.data.sessionId)) &&
@@ -27,7 +114,7 @@ service cloud.firestore {
          get(/databases/$(database)/documents/sessions/$(resource.data.sessionId)).data.counselorId == request.auth.uid);
     }
 
-    // 심리 테스트 결과 규칙
+    // 📋 심리 테스트 결과 규칙 (기존 유지)
     match /testResults/{resultId} {
       allow read, write: if request.auth != null && 
         request.auth.uid == resource.data.userId;
@@ -35,44 +122,38 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'counselor';
     }
 
-    // AI 챗봇 대화 규칙
-    match /chatSessions/{sessionId} {
-      allow read, write: if request.auth != null && 
-        request.auth.uid == resource.data.userId;
-    }
-
-    // 공지사항 규칙
+    // 📢 공지사항 규칙 (기존 유지)
     match /notices/{noticeId} {
-      allow read: if true; // 모든 사용자가 읽기 가능
+      allow read: if true;
       allow write: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // FAQ 규칙
+    // ❓ FAQ 규칙 (기존 유지)
     match /faqs/{faqId} {
-      allow read: if true; // 모든 사용자가 읽기 가능
+      allow read: if true;
       allow write: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // 상담사 프로필 규칙
+    // 👨‍⚕️ 상담사 프로필 규칙 (기존 유지)
     match /counselorProfiles/{profileId} {
-      allow read: if true; // 모든 사용자가 읽기 가능
+      allow read: if true;
       allow write: if request.auth != null && 
         request.auth.uid == profileId &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'counselor';
     }
 
-    // 리뷰 및 평점 규칙
+    // ⭐ 리뷰 및 평점 규칙 (기존 유지)
     match /reviews/{reviewId} {
-      allow read: if true; // 모든 사용자가 읽기 가능
+      allow read: if true;
       allow create: if request.auth != null && 
         request.auth.uid == request.resource.data.userId;
       allow update, delete: if request.auth != null && 
         request.auth.uid == resource.data.userId;
     }
 
-    // 예약 규칙
+    // 📅 예약 규칙 (기존 유지)
     match /appointments/{appointmentId} {
       allow read, write: if request.auth != null && 
         (resource.data.clientId == request.auth.uid || 
@@ -81,15 +162,15 @@ service cloud.firestore {
         request.auth.uid == request.resource.data.clientId;
     }
 
-    // 결제 정보 규칙
+    // 💳 결제 정보 규칙 (기존 유지)
     match /payments/{paymentId} {
       allow read, write: if request.auth != null && 
         request.auth.uid == resource.data.userId;
     }
 
-    // 시스템 설정 규칙
+    // ⚙️ 시스템 설정 규칙 (기존 유지)
     match /settings/{settingId} {
-      allow read: if true; // 모든 사용자가 읽기 가능
+      allow read: if true;
       allow write: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
