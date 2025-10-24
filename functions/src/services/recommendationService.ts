@@ -1,5 +1,5 @@
 import { openai, AI_MODELS } from '../config/ai';
-import * as admin from 'firebase/admin';
+import { db, serverTimestamp } from '../config/firebaseAdmin';
 
 /**
  * 🎯 개인화 추천 시스템
@@ -52,7 +52,8 @@ interface Recommendation {
 }
 
 export class RecommendationService {
-  private db = admin.firestore();
+  // Database instance is imported from firebaseAdmin config
+  private database = db;
 
   /**
    * 메인 추천 생성 함수
@@ -95,7 +96,7 @@ export class RecommendationService {
    */
   private async getUserProfile(userId: string): Promise<UserProfile | null> {
     try {
-      const profileDoc = await this.db
+      const profileDoc = await this.database
         .collection('profiling_results')
         .doc(userId)
         .get();
@@ -127,7 +128,7 @@ export class RecommendationService {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const moodRecordsQuery = await this.db
+      const moodRecordsQuery = await this.database
         .collection('mood_records')
         .doc(userId)
         .collection('records')
@@ -138,13 +139,13 @@ export class RecommendationService {
 
       if (moodRecordsQuery.empty) return null;
 
-      const records = moodRecordsQuery.docs.map(doc => doc.data());
+      const records = moodRecordsQuery.docs.map((doc: any) => doc.data());
       
       // 패턴 분석
-      const moodScores = records.map(r => r.mood?.intensity || 5);
-      const averageMood = moodScores.reduce((a, b) => a + b, 0) / moodScores.length;
+      const moodScores = records.map((r: any) => r.mood?.intensity || 5);
+      const averageMood = moodScores.reduce((a: number, b: number) => a + b, 0) / moodScores.length;
 
-      const emotions = records.flatMap(r => r.mood?.secondary || []);
+      const emotions = records.flatMap((r: any) => r.mood?.secondary || []);
       const dominantEmotions = this.getTopItems(emotions, 3);
 
       return {
@@ -166,7 +167,7 @@ export class RecommendationService {
   private async getBehaviorData(userId: string): Promise<any> {
     try {
       // 앱 사용 패턴, 완료한 활동 등
-      const behaviorDoc = await this.db
+      const behaviorDoc = await this.database
         .collection('user_behavior')
         .doc(userId)
         .get();
@@ -335,14 +336,14 @@ ${JSON.stringify(behaviorData, null, 2)}
     const moodPattern = await this.getMoodPattern(userId);
 
     // 카테고리별 콘텐츠 데이터베이스에서 조회
-    const contentQuery = await this.db
+    const contentQuery = await this.database
       .collection('content_library')
       .where('category', '==', category)
       .where('status', '==', 'active')
       .limit(20)
       .get();
 
-    const contents = contentQuery.docs.map(doc => ({
+    const contents = contentQuery.docs.map((doc: any) => ({
       id: doc.id,
       ...doc.data()
     }));
@@ -393,11 +394,16 @@ ${JSON.stringify(behaviorData, null, 2)}
       })
       .map((activity, index) => ({
         id: `activity_${index}`,
+        type: activity.type as 'content' | 'activity' | 'exercise' | 'mindfulness' | 'social' | 'learning',
+        title: activity.title,
+        description: activity.description,
         priority: 'medium' as const,
         reason: '현재 상황에 적합한 활동입니다',
         actionItems: ['지금 바로 시작해보세요'],
         expectedBenefit: '기분 개선과 스트레스 완화에 도움됩니다',
-        ...activity
+        estimatedTime: activity.estimatedTime,
+        difficulty: activity.difficulty as 'easy' | 'medium' | 'hard',
+        tags: activity.tags
       }));
   }
 
@@ -512,12 +518,12 @@ ${JSON.stringify(behaviorData, null, 2)}
     rating?: number
   ): Promise<void> {
     try {
-      await this.db.collection('recommendation_feedback').add({
+      await this.database.collection('recommendation_feedback').add({
         userId,
         recommendationId,
         feedback,
         rating,
-        timestamp: admin.firestore.FieldValue.serverTimestamp()
+        timestamp: serverTimestamp()
       });
     } catch (error) {
       console.error('추천 피드백 저장 오류:', error);

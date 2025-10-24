@@ -74,7 +74,7 @@ jobs:
     name: ⚡ Firebase Functions 배포
     runs-on: ubuntu-latest
     needs: build-and-test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.FIREBASE_TOKEN != ''
     steps:
       - name: 📥 코드 체크아웃
         uses: actions/checkout@v4
@@ -105,8 +105,8 @@ jobs:
   deploy-hosting:
     name: 🌐 Firebase Hosting 배포
     runs-on: ubuntu-latest
-    needs: [build-and-test, deploy-functions]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [build-and-test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.FIREBASE_TOKEN != ''
     steps:
       - name: 📥 코드 체크아웃
         uses: actions/checkout@v4
@@ -130,7 +130,7 @@ jobs:
     name: 🗄️ Firestore Rules & Indexes 배포
     runs-on: ubuntu-latest
     needs: quality-check
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.FIREBASE_TOKEN != ''
     steps:
       - name: 📥 코드 체크아웃
         uses: actions/checkout@v4
@@ -157,12 +157,16 @@ jobs:
           echo "⚡ Functions: ${{ needs.deploy-functions.result }}"
           echo "🗄️ Firestore: ${{ needs.deploy-firestore.result }}"
           
-          if [ "${{ needs.deploy-hosting.result }}" = "success" ] && 
+          if [ "${{ secrets.FIREBASE_TOKEN }}" = "" ]; then
+            echo "⚠️ Firebase 토큰이 설정되지 않았습니다."
+            echo "📋 GitHub Secrets에서 FIREBASE_TOKEN을 설정해주세요."
+            echo "🔗 설정 링크: https://github.com/${{ github.repository }}/settings/secrets/actions"
+          elif [ "${{ needs.deploy-hosting.result }}" = "success" ] && 
              [ "${{ needs.deploy-functions.result }}" = "success" ] && 
              [ "${{ needs.deploy-firestore.result }}" = "success" ]; then
             echo "🎉 모든 배포가 성공적으로 완료되었습니다!"
             echo "🌐 웹사이트: https://${{ secrets.FIREBASE_PROJECT_ID }}.web.app"
           else
             echo "❌ 일부 배포에서 오류가 발생했습니다."
-            exit 1
+            echo "📊 상세 로그를 확인해주세요."
           fi

@@ -1,9 +1,9 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { OpenAI } from 'openai';
-import * as nodemailer from 'nodemailer';
-import * as cors from 'cors';
-import * as express from 'express';
+// import * as nodemailer from 'nodemailer'; // TODO: Implement email functionality
+import cors from 'cors';
+import express from 'express';
 
 // Firebase Admin 초기화
 admin.initializeApp();
@@ -257,15 +257,19 @@ export const processAIChat = functions.https.onCall(async (data, context) => {
     const conversationHistory = await getConversationHistory(sessionId);
     const userProfile = await getUserProfileForChat(userId);
     
-    const context = {
+    const chatContext = {
       userId,
       sessionId,
-      conversationHistory,
+      conversationHistory: conversationHistory.map((msg: any) => ({
+        role: msg.role || 'user',
+        content: msg.content || '',
+        timestamp: msg.timestamp || new Date()
+      })),
       userProfile
     };
     
     // AI 응답 생성
-    const aiResponse = await chatService.generateResponse(message, context);
+    const aiResponse = await chatService.generateResponse(message, chatContext);
     
     // 대화 저장
     await chatService.saveConversation(userId, sessionId, message, aiResponse);

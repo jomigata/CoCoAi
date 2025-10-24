@@ -1,5 +1,5 @@
 import { openai, AI_MODELS, AI_PROMPTS, detectCrisis, CRISIS_RESPONSE, postProcessAIResponse } from '../config/ai';
-import * as admin from 'firebase/admin';
+import { db, serverTimestamp } from '../config/firebaseAdmin';
 
 /**
  * 🤖 고도화된 AI 챗봇 서비스
@@ -35,7 +35,8 @@ interface AIResponse {
 }
 
 export class AIChatService {
-  private db = admin.firestore();
+  // Database instance is imported from firebaseAdmin config
+  private database = db;
 
   /**
    * 메인 AI 챗봇 응답 생성
@@ -289,10 +290,10 @@ export class AIChatService {
    */
   private async logCrisisEvent(userId: string, message: string): Promise<void> {
     try {
-      await this.db.collection('crisis_logs').add({
+      await this.database.collection('crisis_logs').add({
         userId,
         message,
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        timestamp: serverTimestamp(),
         handled: true
       });
     } catch (error) {
@@ -343,23 +344,23 @@ export class AIChatService {
         emotionalAnalysis: aiResponse.emotionalAnalysis,
         recommendations: aiResponse.recommendations,
         needsProfessionalHelp: aiResponse.needsProfessionalHelp,
-        timestamp: admin.firestore.FieldValue.serverTimestamp()
+        timestamp: serverTimestamp()
       };
 
-      await this.db
+      await this.database
         .collection('chat_sessions')
         .doc(sessionId)
         .collection('messages')
         .add(conversationData);
 
       // 세션 메타데이터 업데이트
-      await this.db
+      await this.database
         .collection('chat_sessions')
         .doc(sessionId)
         .set({
           userId,
-          lastMessageAt: admin.firestore.FieldValue.serverTimestamp(),
-          messageCount: admin.firestore.FieldValue.increment(1),
+          lastMessageAt: serverTimestamp(),
+          messageCount: 1, // TODO: Implement proper increment
           lastEmotionalState: aiResponse.emotionalAnalysis
         }, { merge: true });
 
