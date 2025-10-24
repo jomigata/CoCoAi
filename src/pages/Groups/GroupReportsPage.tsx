@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@store/AuthContext';
-import { collection, query, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
+// import { useAuth } from '@store/AuthContext'; // Will be used when implementing user-specific features
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@config/firebase';
 import toast from 'react-hot-toast';
 import { 
@@ -16,7 +16,6 @@ import {
   RefreshCw,
   ChevronDown,
   ChevronUp,
-  Star,
   AlertCircle,
   Lightbulb,
   ArrowRight,
@@ -87,7 +86,7 @@ interface WeeklyReport {
  */
 const GroupReportsPage: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Will be used when implementing user-specific features
   const navigate = useNavigate();
   
   const [group, setGroup] = useState<Group | null>(null);
@@ -181,7 +180,7 @@ const GroupReportsPage: React.FC = () => {
             recommendations: [
               {
                 targetMember: '김철수',
-                category: 'stress_management',
+                category: 'mindfulness',
                 advice: '주중 스트레스 관리를 위한 짧은 휴식 시간을 만들어보세요.',
                 actionItems: [
                   '점심시간 10분 명상하기',
@@ -191,7 +190,7 @@ const GroupReportsPage: React.FC = () => {
               },
               {
                 targetMember: '이영희',
-                category: 'confidence',
+                category: 'communication',
                 advice: '새로운 도전에 대한 자신감을 키워보세요.',
                 actionItems: [
                   '작은 목표부터 달성하기',

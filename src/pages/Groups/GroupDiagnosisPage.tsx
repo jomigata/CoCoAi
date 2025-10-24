@@ -13,8 +13,6 @@ import {
   Clock,
   ArrowRight,
   Brain,
-  Lightbulb,
-  Star,
   AlertTriangle
 } from 'lucide-react';
 
@@ -47,11 +45,12 @@ interface DiagnosisQuestion {
   required: boolean;
 }
 
-interface DiagnosisResponse {
-  questionId: string;
-  response: any;
-  memberId: string;
-}
+// TODO: Interface will be used when implementing actual diagnosis functionality
+// interface DiagnosisResponse {
+//   questionId: string;
+//   response: any;
+//   memberId: string;
+// }
 
 /**
  * 🧠 그룹 심층 진단 페이지

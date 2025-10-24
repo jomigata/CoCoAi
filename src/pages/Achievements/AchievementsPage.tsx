@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@store/AuthContext';
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '@config/firebase';
+// TODO: Firebase imports will be used when implementing actual achievement loading
+// import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+// import { db } from '@config/firebase';
 import toast from 'react-hot-toast';
 import { 
   Award, 
@@ -15,7 +16,6 @@ import {
   Zap,
   Crown,
   Medal,
-  Gift,
   Sparkles,
   TrendingUp,
   CheckCircle,
@@ -86,7 +86,7 @@ const AchievementsPage: React.FC = () => {
     setIsLoading(true);
     try {
       // 사용자 통계 및 성취 데이터 로드
-      const stats = await calculateUserStats(user.uid);
+      const stats = await calculateUserStats();
       setUserStats(stats);
     } catch (error) {
       console.error('사용자 통계 로드 오류:', error);
@@ -99,8 +99,8 @@ const AchievementsPage: React.FC = () => {
     }
   };
 
-  const calculateUserStats = async (userId: string): Promise<UserStats> => {
-    // 실제 구현에서는 Firestore에서 데이터 수집
+  const calculateUserStats = async (): Promise<UserStats> => {
+    // TODO: 실제 구현에서는 Firestore에서 사용자 데이터 수집
     // 임시로 목업 데이터 반환
     return getMockUserStats();
   };

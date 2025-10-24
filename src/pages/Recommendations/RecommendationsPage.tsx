@@ -9,7 +9,6 @@ import {
   Activity, 
   Brain, 
   Users, 
-  Star,
   Clock,
   Target,
   Heart,
@@ -79,8 +78,9 @@ const RecommendationsPage: React.FC = () => {
         limit: 10
       });
 
-      if (result.data.success) {
-        setRecommendations(result.data.recommendations);
+      const data = result.data as { success?: boolean; recommendations?: Recommendation[] };
+      if (data.success) {
+        setRecommendations(data.recommendations || []);
       }
     } catch (error) {
       console.error('추천 로드 오류:', error);

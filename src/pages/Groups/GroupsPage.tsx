@@ -557,7 +557,7 @@ const GroupsPage: React.FC = () => {
                 onClick={() => setShowInviteModal(false)}
                 className="text-gray-400 hover:text-gray-600"
               >
-                <X className="w-6 h-6" />
+                <span className="text-xl">×</span>
               </button>
             </div>
 

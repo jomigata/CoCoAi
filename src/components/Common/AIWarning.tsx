@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Info, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { AlertTriangle, Info, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface AIWarningProps {
   message?: string;

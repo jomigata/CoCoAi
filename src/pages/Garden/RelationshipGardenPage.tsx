@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@store/AuthContext';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from '@config/firebase';
+// TODO: Firebase imports will be used when implementing actual garden data
+// import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+// import { db } from '@config/firebase';
 import toast from 'react-hot-toast';
 import { 
   Flower, 
@@ -13,7 +14,6 @@ import {
   Heart,
   Users,
   Star,
-  Gift,
   Zap,
   Leaf,
   Cherry,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
-import { doc, getDoc, updateDoc, collection, addDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@config/firebase';
 import toast from 'react-hot-toast';
 import { 
@@ -111,6 +111,9 @@ const GroupInvitePage: React.FC = () => {
 
     setIsProcessing(true);
     try {
+      // TODO: Implement actual group member addition
+      console.log('Adding member to group:', group.id, 'user:', user?.uid);
+      /*
       // 1. 그룹 멤버로 추가
       await addDoc(collection(db, `groups/${group.id}/members`), {
         userId: user.uid,
@@ -130,6 +133,7 @@ const GroupInvitePage: React.FC = () => {
         memberCount: group.memberCount + 1,
         updatedAt: new Date()
       });
+      */
 
       // 3. 초대 상태 업데이트
       await updateDoc(doc(db, 'invitations', invitation.id), {

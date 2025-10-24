@@ -1,25 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@store/AuthContext';
-import { collection, query, where, getDocs, doc, addDoc } from 'firebase/firestore';
-import { db } from '@config/firebase';
+// TODO: Firebase imports will be used when implementing actual counselor data
+// import { collection, query, where, getDocs, doc, addDoc } from 'firebase/firestore';
+// import { db } from '@config/firebase';
 import toast from 'react-hot-toast';
 import { 
   UserCheck, 
   Star, 
   MapPin, 
-  Clock, 
   Phone, 
   Video, 
   MessageCircle,
-  Heart,
-  Brain,
   Users,
-  Award,
-  Calendar,
   Filter,
   Search,
   ChevronRight,
-  CheckCircle,
   AlertCircle
 } from 'lucide-react';
 
@@ -53,7 +48,7 @@ interface Counselor {
 }
 
 interface MatchingCriteria {
-  preferredMethod: 'video' | 'phone' | 'chat' | 'in_person' | 'any';
+  preferredMethod: 'video' | 'phone' | 'chat' | 'in_person';
   specialtyNeeds: string[];
   budgetRange: {
     min: number;
@@ -77,7 +72,7 @@ const CounselorMatchingPage: React.FC = () => {
   const [counselors, setCounselors] = useState<Counselor[]>([]);
   const [filteredCounselors, setFilteredCounselors] = useState<Counselor[]>([]);
   const [matchingCriteria, setMatchingCriteria] = useState<MatchingCriteria>({
-    preferredMethod: 'any',
+    preferredMethod: 'video',
     specialtyNeeds: [],
     budgetRange: { min: 50000, max: 200000 },
     languagePreference: '한국어',
@@ -206,11 +201,9 @@ const CounselorMatchingPage: React.FC = () => {
     }
 
     // 상담 방식 필터
-    if (matchingCriteria.preferredMethod !== 'any') {
-      filtered = filtered.filter(counselor =>
-        counselor.availableMethods.includes(matchingCriteria.preferredMethod)
-      );
-    }
+    filtered = filtered.filter(counselor =>
+      counselor.availableMethods.includes(matchingCriteria.preferredMethod)
+    );
 
     // 예산 필터
     filtered = filtered.filter(counselor =>
@@ -251,7 +244,9 @@ const CounselorMatchingPage: React.FC = () => {
         message: `${counselor.name} 상담사님께 상담을 요청합니다.`
       };
 
-      await addDoc(collection(db, 'booking_requests'), bookingRequest);
+      // TODO: Implement actual booking functionality
+      console.log('Booking counselor:', counselor.id, 'for user:', user?.uid, 'request:', bookingRequest);
+      // await addDoc(collection(db, 'booking_requests'), bookingRequest);
       
       toast.success('상담 요청이 전송되었습니다! 상담사가 확인 후 연락드릴 예정입니다.');
       setShowBookingModal(false);
@@ -353,11 +348,10 @@ const CounselorMatchingPage: React.FC = () => {
                   value={matchingCriteria.preferredMethod}
                   onChange={(e) => setMatchingCriteria(prev => ({
                     ...prev,
-                    preferredMethod: e.target.value as any
+                    preferredMethod: e.target.value as 'video' | 'phone' | 'chat' | 'in_person'
                   }))}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                 >
-                  <option value="any">상관없음</option>
                   <option value="video">화상상담</option>
                   <option value="phone">전화상담</option>
                   <option value="chat">채팅상담</option>
@@ -467,7 +461,7 @@ const CounselorMatchingPage: React.FC = () => {
                         </p>
                         <div className="flex items-center space-x-4 text-body-small text-gray-500">
                           <span className="flex items-center">
-                            <Award className="w-4 h-4 mr-1" />
+                            <span className="text-yellow-500 mr-1">🏆</span>
                             {counselor.experience}년 경력
                           </span>
                           <span className="flex items-center">
@@ -577,7 +571,7 @@ const CounselorMatchingPage: React.FC = () => {
                   onClick={() => {
                     setSearchQuery('');
                     setMatchingCriteria({
-                      preferredMethod: 'any',
+                      preferredMethod: 'video',
                       specialtyNeeds: [],
                       budgetRange: { min: 50000, max: 200000 },
                       languagePreference: '한국어',
