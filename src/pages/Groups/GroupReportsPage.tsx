@@ -69,6 +69,7 @@ interface WeeklyReport {
       message: string;
       details: string[];
       timestamp: string;
+      version?: string;
     };
   };
   memberCount: number;

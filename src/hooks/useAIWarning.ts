@@ -12,6 +12,7 @@ export interface AIWarningData {
   details: string[];
   timestamp: string;
   type: 'warning' | 'info' | 'critical';
+  version?: string;
 }
 
 interface UseAIWarningOptions {
@@ -98,7 +99,8 @@ export const useAIWarning = (options: UseAIWarningOptions = {}): AIWarningData =
       message: severityConfig[severity].message,
       details,
       timestamp: new Date().toISOString(),
-      type: severityConfig[severity].type
+      type: severityConfig[severity].type,
+      version: '2.0'
     };
   }, [analysisType, severity, includeEmergencyContact]);
 
