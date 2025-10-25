@@ -18,9 +18,7 @@ import {
   RefreshCw,
   Filter,
   Search,
-  Play,
-  Pause,
-  CheckCircle
+  Play
 } from 'lucide-react';
 import { AIWarning } from '../../components/Common/AIWarning';
 import { useAIWarning } from '../../hooks/useAIWarning';

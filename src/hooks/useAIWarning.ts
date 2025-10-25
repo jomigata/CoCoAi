@@ -16,7 +16,7 @@ export interface AIWarningData {
 }
 
 interface UseAIWarningOptions {
-  analysisType?: 'profiling' | 'mood' | 'group' | 'chat' | 'general';
+  analysisType?: 'profiling' | 'mood' | 'group' | 'chat' | 'general' | 'communication';
   severity?: 'low' | 'medium' | 'high';
   includeEmergencyContact?: boolean;
 }
@@ -60,6 +60,12 @@ export const useAIWarning = (options: UseAIWarningOptions = {}): AIWarningData =
         "AI 챗봇은 정서적 지지를 제공하지만 전문 상담을 대체할 수 없습니다.",
         "위기 상황이나 심각한 고민은 전문가의 도움을 받으세요.",
         "AI 응답은 일반적인 조언으로, 개인 상황에 맞지 않을 수 있습니다."
+      ],
+      communication: [
+        ...baseDetails,
+        "소통 도구는 관계 개선을 위한 보조 수단입니다.",
+        "실제 소통의 복잡성과 맥락을 완전히 반영하지 못할 수 있습니다.",
+        "중요한 관계 문제는 전문가와의 상담을 통해 해결하세요."
       ],
       general: baseDetails
     };
