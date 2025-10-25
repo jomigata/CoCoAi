@@ -18,7 +18,6 @@ import {
   RefreshCw,
   Info,
   Plus,
-  Droplets,
   Scissors,
   Package
 } from 'lucide-react';
@@ -199,7 +198,7 @@ const RelationshipGardenPage: React.FC = () => {
         // 정원 다시 로드
         loadGarden();
       } else {
-        toast.info('아직 성장할 식물이 없습니다.');
+        toast.success('아직 성장할 식물이 없습니다.');
       }
       
     } catch (error) {

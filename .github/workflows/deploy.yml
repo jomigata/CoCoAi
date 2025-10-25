@@ -10,12 +10,17 @@ env:
   NODE_VERSION: '18'
   LANG: 'ko_KR.UTF-8'
   LC_ALL: 'ko_KR.UTF-8'
+  LC_CTYPE: 'ko_KR.UTF-8'
+  PYTHONIOENCODING: 'utf-8'
 
 jobs:
   # 코드 품질 검사
   quality-check:
     name: 🔍 코드 품질 검사
     runs-on: ubuntu-latest
+    env:
+      LANG: 'ko_KR.UTF-8'
+      LC_ALL: 'ko_KR.UTF-8'
     steps:
       - name: 📥 코드 체크아웃
         uses: actions/checkout@v4
@@ -153,6 +158,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: quality-check
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    env:
+      LANG: 'ko_KR.UTF-8'
+      LC_ALL: 'ko_KR.UTF-8'
     steps:
       - name: 📥 코드 체크아웃
         uses: actions/checkout@v4
@@ -169,7 +177,7 @@ jobs:
           echo "🔧 Firebase 프로젝트 설정..."
           firebase use ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
           echo "🚀 Firestore Rules & Indexes 배포 시작..."
-          firebase deploy --only firestore --project ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }} --debug
+          firebase deploy --only firestore:rules,firestore:indexes --project ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }} --debug
         env:
           FIREBASE_PROJECT: ${{ secrets.FIREBASE_PROJECT_ID }}
 

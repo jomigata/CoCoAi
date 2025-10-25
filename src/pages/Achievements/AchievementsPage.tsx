@@ -17,10 +17,7 @@ import {
   Sparkles,
   TrendingUp,
   CheckCircle,
-  Lock,
-  Gift,
-  MessageCircle,
-  Flower
+  Lock
 } from 'lucide-react';
 import { AIWarning } from '../../components/Common/AIWarning';
 import { useAIWarning } from '../../hooks/useAIWarning';
@@ -76,11 +73,9 @@ const AchievementsPage: React.FC = () => {
   const functions = getFunctions();
   
   const [userStats, setUserStats] = useState<UserStats | null>(null);
-  const [badgeProgress, setBadgeProgress] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<'all' | Achievement['category']>('all');
   const [showUnlockedOnly, setShowUnlockedOnly] = useState(false);
-  const [recentlyUnlocked, setRecentlyUnlocked] = useState<any[]>([]);
 
   // AI 경고 시스템
   const aiWarning = useAIWarning({
@@ -102,25 +97,17 @@ const AchievementsPage: React.FC = () => {
     try {
       // Firebase Functions를 통한 실제 사용자 통계 로드
       const getUserStats = httpsCallable(functions, 'getUserStats');
-      const getUserBadgeProgress = httpsCallable(functions, 'getUserBadgeProgress');
       
-      const [statsResult, progressResult] = await Promise.all([
-        getUserStats({ userId: user.uid }),
-        getUserBadgeProgress({ userId: user.uid })
-      ]);
-      
+      const statsResult = await getUserStats({ userId: user.uid });
       const statsData = statsResult.data as { success: boolean; userStats: UserStats };
-      const progressData = progressResult.data as { success: boolean; badgeProgress: any[] };
       
-      if (statsData.success && progressData.success) {
+      if (statsData.success) {
         setUserStats(statsData.userStats);
-        setBadgeProgress(progressData.badgeProgress);
         toast.success('성취 정보를 불러왔습니다!');
       } else {
         // 폴백으로 목업 데이터 사용
         const mockStats = getMockUserStats();
         setUserStats(mockStats);
-        setBadgeProgress([]);
       }
     } catch (error) {
       console.error('사용자 통계 로드 오류:', error);
@@ -129,7 +116,6 @@ const AchievementsPage: React.FC = () => {
       // 폴백 데이터
       const mockStats = getMockUserStats();
       setUserStats(mockStats);
-      setBadgeProgress([]);
     } finally {
       setIsLoading(false);
     }
@@ -587,7 +573,7 @@ const AchievementsPage: React.FC = () => {
 
         {/* AI 경고 */}
         <div className="mt-8">
-          <AIWarning warningData={aiWarning} />
+          <AIWarning {...aiWarning} />
         </div>
       </div>
     </div>
