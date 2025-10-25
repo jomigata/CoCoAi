@@ -88,7 +88,7 @@ echo %GREEN%✅ GitHub 푸시 완료!%RESET%
 echo %BLUE%🔄 GitHub Actions가 자동 배포를 시작합니다...%RESET%
 echo.
 echo %YELLOW%📊 배포 상태 확인:%RESET%
-echo %BLUE%   - GitHub Actions: https://github.com/wizcoco-ai/CoCoAi/actions%RESET%
+echo %BLUE%   - GitHub Actions: https://github.com/jomigata/CoCoAi/actions%RESET%
 echo %BLUE%   - Firebase Console: https://console.firebase.google.com%RESET%
 echo.
 

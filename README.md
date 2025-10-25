@@ -85,7 +85,7 @@ src/
 
 1. **저장소 클론**
    ```bash
-   git clone https://github.com/wizcoco-ai/CoCoAi.git
+   git clone https://github.com/jomigata/CoCoAi.git
    cd CoCoAi
    ```
 
@@ -225,7 +225,7 @@ GitHub Actions를 통한 자동화된 CI/CD 파이프라인이 구축되어 있�
 
 ## 📞 연락처
 
-- **프로젝트 링크**: [https://github.com/wizcoco-ai/CoCoAi](https://github.com/wizcoco-ai/CoCoAi)
+- **프로젝트 링크**: [https://github.com/jomigata/CoCoAi](https://github.com/jomigata/CoCoAi)
 - **웹사이트**: [https://cocoai-60a2d.web.app](https://cocoai-60a2d.web.app)
 - **이메일**: support@cocoai.com
 

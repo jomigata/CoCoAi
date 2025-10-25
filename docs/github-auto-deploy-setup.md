@@ -83,7 +83,7 @@ git push origin main
 ## 📊 5단계: 배포 상태 확인
 
 ### 5.1 GitHub Actions 확인
-- URL: https://github.com/wizcoco-ai/CoCoAi/actions
+- URL: https://github.com/jomigata/CoCoAi/actions
 - 각 워크플로우의 실행 상태와 로그 확인 가능
 
 ### 5.2 Firebase Console 확인

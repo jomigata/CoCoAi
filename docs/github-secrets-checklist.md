@@ -15,9 +15,9 @@
 
 ## 🔗 빠른 링크
 
-- **GitHub Secrets 설정**: https://github.com/wizcoco-ai/CoCoAi/settings/secrets/actions
+- **GitHub Secrets 설정**: https://github.com/jomigata/CoCoAi/settings/secrets/actions
 - **Firebase Console**: https://console.firebase.google.com/project/cocoai-60a2d
-- **GitHub Actions**: https://github.com/wizcoco-ai/CoCoAi/actions
+- **GitHub Actions**: https://github.com/jomigata/CoCoAi/actions
 
 ## 🚀 설정 후 테스트
 

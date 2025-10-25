@@ -28,7 +28,7 @@ cd /d "%~dp0\.."
 echo %YELLOW%📋 1단계: GitHub Secrets 설정 확인%RESET%
 echo.
 echo 다음 링크에서 모든 시크릿이 설정되었는지 확인하세요:
-echo %BLUE%🔗 https://github.com/wizcoco-ai/CoCoAi/settings/secrets/actions%RESET%
+echo %BLUE%🔗 https://github.com/jomigata/CoCoAi/settings/secrets/actions%RESET%
 echo.
 echo 필수 시크릿 목록:
 echo   ✓ FIREBASE_TOKEN
@@ -85,7 +85,7 @@ git commit -m "test: GitHub Actions 자동 배포 테스트 - %timestamp%
 - FIREBASE_PROJECT_ID: ✓
 - VITE_FIREBASE_* 환경변수: ✓
 
-🔗 배포 상태 확인: https://github.com/wizcoco-ai/CoCoAi/actions"
+🔗 배포 상태 확인: https://github.com/jomigata/CoCoAi/actions"
 
 if %errorlevel% neq 0 (
     echo %RED%❌ 커밋 생성 실패 (변경사항이 없을 수 있습니다)%RESET%
@@ -110,7 +110,7 @@ echo.
 echo %BLUE%🔄 GitHub Actions 워크플로우가 시작되었습니다!%RESET%
 echo.
 echo %YELLOW%📊 실시간 배포 상태 확인:%RESET%
-echo %BLUE%   🔗 GitHub Actions: https://github.com/wizcoco-ai/CoCoAi/actions%RESET%
+echo %BLUE%   🔗 GitHub Actions: https://github.com/jomigata/CoCoAi/actions%RESET%
 echo %BLUE%   🔗 Firebase Console: https://console.firebase.google.com/project/cocoai-60a2d%RESET%
 echo.
 echo %YELLOW%⏱️ 예상 배포 시간: 3-5분%RESET%
