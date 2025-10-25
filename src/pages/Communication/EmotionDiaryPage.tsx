@@ -4,12 +4,6 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import toast from 'react-hot-toast';
 import { 
   Heart, 
-  MessageCircle, 
-  Users, 
-  Calendar,
-  Plus,
-  Edit3,
-  Trash2,
   Smile,
   Frown,
   Meh,
@@ -24,7 +18,6 @@ import {
 import { AIWarning } from '../../components/Common/AIWarning';
 import { useAIWarning } from '../../hooks/useAIWarning';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
-import ErrorMessage from '../../components/Common/ErrorMessage';
 
 interface EmotionDiary {
   id: string;
@@ -73,8 +66,6 @@ const EmotionDiaryPage: React.FC = () => {
   
   const [diaries, setDiaries] = useState<EmotionDiary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedDiary, setSelectedDiary] = useState<EmotionDiary | null>(null);
   const [newComment, setNewComment] = useState('');
   const [filterEmotion, setFilterEmotion] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -124,30 +115,6 @@ const EmotionDiaryPage: React.FC = () => {
       setDiaries(getMockDiaries());
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const createEmotionDiary = async (diaryData: NewDiaryEntry) => {
-    if (!user) return;
-
-    try {
-      const createDiary = httpsCallable(functions, 'createEmotionDiary');
-      const result = await createDiary({
-        ...diaryData,
-        authorId: user.uid,
-        authorName: user.displayName || '익명'
-      });
-      
-      const data = result.data as { success: boolean; diary: EmotionDiary };
-      
-      if (data.success) {
-        setDiaries(prev => [data.diary, ...prev]);
-        setShowCreateModal(false);
-        toast.success('감정 일기가 작성되었습니다!');
-      }
-    } catch (error) {
-      console.error('감정 일기 작성 오류:', error);
-      toast.error('감정 일기 작성 중 오류가 발생했습니다.');
     }
   };
 
@@ -325,15 +292,6 @@ const EmotionDiaryPage: React.FC = () => {
           <p className="text-body-large text-gray-600 max-w-2xl mx-auto mb-6">
             그룹 멤버들과 마음을 나누고 서로를 이해하는 공간입니다.
           </p>
-          
-          {/* 새 일기 작성 버튼 */}
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="flex items-center px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg font-medium transition-colors mx-auto"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            새 일기 작성하기
-          </button>
         </div>
 
         <div className="max-w-4xl mx-auto">
@@ -506,15 +464,9 @@ const EmotionDiaryPage: React.FC = () => {
               <h3 className="text-xl font-medium text-gray-900 mb-2">
                 아직 작성된 일기가 없습니다
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600">
                 첫 번째 감정 일기를 작성해보세요!
               </p>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg font-medium transition-colors"
-              >
-                일기 작성하기
-              </button>
             </div>
           )}
         </div>
