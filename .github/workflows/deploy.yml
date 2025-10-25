@@ -100,8 +100,10 @@ jobs:
         run: |
           echo "🔍 Firebase 프로젝트 확인..."
           firebase projects:list --token ${{ secrets.FIREBASE_TOKEN }}
+          echo "🔧 Firebase 프로젝트 설정..."
+          firebase use ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
           echo "🚀 Functions 배포 시작..."
-          firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }} --debug
+          firebase deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }} --debug
         env:
           FIREBASE_PROJECT: ${{ secrets.FIREBASE_PROJECT_ID }}
 
@@ -128,8 +130,10 @@ jobs:
         run: |
           echo "🔍 빌드 파일 확인..."
           ls -la dist/
+          echo "🔧 Firebase 프로젝트 설정..."
+          firebase use ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
           echo "🚀 Hosting 배포 시작..."
-          firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }} --debug
+          firebase deploy --only hosting --project ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }} --debug
         env:
           FIREBASE_PROJECT: ${{ secrets.FIREBASE_PROJECT_ID }}
 
@@ -150,8 +154,10 @@ jobs:
         run: |
           echo "🔍 Firestore 설정 파일 확인..."
           ls -la firestore.*
+          echo "🔧 Firebase 프로젝트 설정..."
+          firebase use ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
           echo "🚀 Firestore Rules & Indexes 배포 시작..."
-          firebase deploy --only firestore --token ${{ secrets.FIREBASE_TOKEN }} --debug
+          firebase deploy --only firestore --project ${{ secrets.FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }} --debug
         env:
           FIREBASE_PROJECT: ${{ secrets.FIREBASE_PROJECT_ID }}
 
