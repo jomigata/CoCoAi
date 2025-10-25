@@ -118,8 +118,8 @@ const GroupDiagnosisPage: React.FC = () => {
       const getGroupDiagnosisQuestions = httpsCallable(functions, 'getGroupDiagnosisQuestions');
       
       const result = await getGroupDiagnosisQuestions({ groupType: group.type });
-      if (result.data.success) {
-        setQuestions(result.data.questions);
+      if ((result.data as any).success) {
+        setQuestions((result.data as any).questions);
       } else {
         throw new Error('질문 로드 실패');
       }
@@ -233,7 +233,7 @@ const GroupDiagnosisPage: React.FC = () => {
         responses: diagnosisResponses
       });
 
-      if (result.data.success) {
+      if ((result.data as any).success) {
         // 응답 저장
         const diagnosisData = {
           groupId,

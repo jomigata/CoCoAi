@@ -44,7 +44,6 @@ const PersonalProfilingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasExistingProfile, setHasExistingProfile] = useState(false);
   const [questions, setQuestions] = useState<ProfilingQuestion[]>([]);
-  const [ageGroup, setAgeGroup] = useState<string>('20s');
 
   // 개인 종합 프로파일링 질문들
   const profilingQuestions: ProfilingQuestion[] = [
@@ -184,12 +183,11 @@ const PersonalProfilingPage: React.FC = () => {
     }
   ];
 
-  const totalSteps = profilingQuestions.length;
 
   useEffect(() => {
     checkExistingProfile();
     loadQuestions();
-  }, [user, ageGroup]);
+  }, [user]);
 
   const checkExistingProfile = async () => {
     if (!user) return;
@@ -211,9 +209,9 @@ const PersonalProfilingPage: React.FC = () => {
       const functions = getFunctions();
       const getProfilingQuestions = httpsCallable(functions, 'getProfilingQuestions');
       
-      const result = await getProfilingQuestions({ ageGroup });
-      if (result.data.success) {
-        setQuestions(result.data.questions);
+      const result = await getProfilingQuestions({ ageGroup: '20s' });
+      if ((result.data as any).success) {
+        setQuestions((result.data as any).questions);
       }
     } catch (error) {
       console.error('질문 로드 오류:', error);
@@ -250,69 +248,6 @@ const PersonalProfilingPage: React.FC = () => {
     }
   };
 
-  const calculateProfilingData = (): ProfilingData => {
-    // 자아존중감 점수 계산 (평균)
-    const selfEsteemScores = [
-      responses.self_worth || 0,
-      responses.self_confidence || 0,
-      responses.self_acceptance || 0
-    ];
-    const selfEsteem = Math.round(
-      selfEsteemScores.reduce((sum, score) => sum + score, 0) / selfEsteemScores.length * 20
-    ); // 100점 만점으로 변환
-
-    return {
-      selfEsteem,
-      stressCoping: responses.stress_coping || [],
-      relationshipPattern: responses.relationship_style || '',
-      coreValues: responses.core_values || [],
-      strengths: responses.personal_strengths || []
-    };
-  };
-
-  const generateMindMap = (profileData: ProfilingData) => {
-    // 성격 유형 결정
-    let personality = '';
-    if (profileData.relationshipPattern.includes('외향적')) {
-      personality = '외향형 리더';
-    } else if (profileData.relationshipPattern.includes('내향적')) {
-      personality = '내향형 사색가';
-    } else if (profileData.relationshipPattern.includes('유연하게')) {
-      personality = '적응형 중재자';
-    } else {
-      personality = '균형형 협력자';
-    }
-
-    // 감정 패턴 분석
-    let emotionalPattern = '';
-    if (profileData.stressCoping.includes('친구나 가족과 대화')) {
-      emotionalPattern = '관계 중심형';
-    } else if (profileData.stressCoping.includes('혼자만의 시간 갖기')) {
-      emotionalPattern = '내적 성찰형';
-    } else if (profileData.stressCoping.includes('문제 해결에 집중하기')) {
-      emotionalPattern = '해결 지향형';
-    } else {
-      emotionalPattern = '감정 표현형';
-    }
-
-    // 소통 스타일 결정
-    let communicationStyle = '';
-    if (profileData.strengths.includes('의사소통 능력')) {
-      communicationStyle = '적극적 소통형';
-    } else if (profileData.strengths.includes('공감 능력')) {
-      communicationStyle = '공감적 경청형';
-    } else if (profileData.strengths.includes('논리적 사고')) {
-      communicationStyle = '논리적 설득형';
-    } else {
-      communicationStyle = '조화로운 대화형';
-    }
-
-    return {
-      personality,
-      emotionalPattern,
-      communicationStyle
-    };
-  };
 
   const handleSubmit = async () => {
     if (!user) {
@@ -328,19 +263,19 @@ const PersonalProfilingPage: React.FC = () => {
       
       const result = await analyzeProfilingResults({
         userId: user.uid,
-        ageGroup,
+        ageGroup: '20s',
         responses
       });
 
-      if (result.data.success) {
+      if ((result.data as any).success) {
         // 사용자 문서 업데이트
         await setDoc(doc(db, 'users', user.uid), {
           personalProfile: {
-            ageGroup,
+            ageGroup: '20s',
             completedAt: new Date(),
-            profileData: result.data.result.scores,
-            mindMap: result.data.result.mindMap,
-            aiAnalysis: result.data.result.aiAnalysis
+            profileData: (result.data as any).result.scores,
+            mindMap: (result.data as any).result.mindMap,
+            aiAnalysis: (result.data as any).result.aiAnalysis
           }
         }, { merge: true });
 
@@ -357,11 +292,6 @@ const PersonalProfilingPage: React.FC = () => {
     }
   };
 
-  const getAgeGroup = (): string => {
-    // 실제로는 사용자 생년월일 정보를 바탕으로 계산
-    // 현재는 기본값 반환
-    return '20s';
-  };
 
   const renderQuestion = () => {
     const question = questions[currentStep];

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@config/firebase';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import toast from 'react-hot-toast';
@@ -91,7 +91,6 @@ interface WeeklyReport {
  */
 const WeeklyReportPage: React.FC = () => {
   const { groupId } = useParams<{ groupId: string }>();
-  const { user } = useAuth();
   const navigate = useNavigate();
   
   const [group, setGroup] = useState<Group | null>(null);
@@ -142,8 +141,8 @@ const WeeklyReportPage: React.FC = () => {
         weekStartDate
       });
 
-      if (result.data.success) {
-        setReport(result.data.reportResult);
+      if ((result.data as any).success) {
+        setReport((result.data as any).reportResult);
       } else {
         // 리포트가 없으면 생성
         await generateWeeklyReport();
@@ -176,8 +175,8 @@ const WeeklyReportPage: React.FC = () => {
         weekStartDate
       });
 
-      if (result.data.success) {
-        setReport(result.data.reportResult);
+      if ((result.data as any).success) {
+        setReport((result.data as any).reportResult);
         toast.success('위클리 리포트가 생성되었습니다! 🎉');
       } else {
         throw new Error('리포트 생성 실패');
