@@ -27,6 +27,9 @@ import RelationshipGardenPage from '@pages/Garden/RelationshipGardenPage';
 import CounselorMatchingPage from '@pages/Counselor/CounselorMatchingPage';
 import PersonalGrowthPage from '@pages/Growth/PersonalGrowthPage';
 
+// Phase 2: 소통 개선 도구 페이지들
+import ConversationStarterPage from '@pages/Communication/ConversationStarterPage';
+
 // 컨텍스트 임포트
 import { AuthProvider } from '@store/AuthContext';
 import { ThemeProvider } from '@store/ThemeContext';
@@ -68,6 +71,9 @@ function App() {
                 <Route path="/garden" element={<RelationshipGardenPage />} />
                 <Route path="/counselor-matching" element={<CounselorMatchingPage />} />
                 <Route path="/growth" element={<PersonalGrowthPage />} />
+                
+                {/* Phase 2: 소통 개선 도구 라우트 */}
+                <Route path="/communication/starters" element={<ConversationStarterPage />} />
                 
                 {/* 404 페이지 */}
                 <Route path="*" element={<NotFoundPage />} />

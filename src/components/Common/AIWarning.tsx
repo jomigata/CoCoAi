@@ -135,4 +135,5 @@ const AIWarning: React.FC<AIWarningProps> = ({
   );
 };
 
+export { AIWarning };
 export default AIWarning;

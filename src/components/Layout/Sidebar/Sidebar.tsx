@@ -13,7 +13,10 @@ import {
   Brain,
   Heart,
   Bot,
-  TrendingUp
+  TrendingUp,
+  MessageSquare,
+  BookOpen,
+  Gift
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
@@ -30,6 +33,13 @@ const Sidebar: React.FC = () => {
     { name: '프로파일링', href: '/profiling', icon: Brain },
     { name: '상담', href: '/counseling', icon: MessageCircle },
     { name: '프로필', href: '/profile', icon: User },
+  ];
+
+  // Phase 2: 소통 개선 도구 메뉴
+  const communicationItems = [
+    { name: '대화 스타터', href: '/communication/starters', icon: MessageSquare },
+    { name: '감정 교환 일기', href: '/communication/diary', icon: BookOpen },
+    { name: '메시지 템플릿', href: '/communication/messages', icon: Gift },
   ];
 
   const adminItems = [
@@ -81,6 +91,33 @@ const Sidebar: React.FC = () => {
                       className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                         isActive(item.href)
                           ? 'bg-pink-100 dark:bg-pink-900 text-pink-700 dark:text-pink-300'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span>{item.name}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {/* Phase 2: 소통 개선 도구 메뉴 */}
+          <div className="mb-6">
+            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+              소통 도구
+            </h3>
+            <ul className="space-y-1">
+              {communicationItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.name}>
+                    <Link
+                      to={item.href}
+                      className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                        isActive(item.href)
+                          ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                       }`}
                     >

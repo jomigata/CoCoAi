@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.api = exports.createGrowthProgram = exports.analyzeDream = exports.generatePersonalGrowthReport = exports.saveRecommendationFeedback = exports.generateRecommendations = exports.analyzeMoodPatterns = exports.processAIChat = exports.sendGroupInvitation = exports.generateGroupReport = exports.analyzeProfilingResults = void 0;
+exports.api = exports.analyzeGroupValues = exports.createPersonalizedMessage = exports.createEmotionDiary = exports.getConversationStarters = exports.createGrowthProgram = exports.analyzeDream = exports.generatePersonalGrowthReport = exports.saveRecommendationFeedback = exports.generateRecommendations = exports.analyzeMoodPatterns = exports.processAIChat = exports.sendGroupInvitation = exports.generateGroupReport = exports.analyzeProfilingResults = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const openai_1 = require("openai");
@@ -49,6 +49,11 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
+// Phase 2: 소통 개선 도구 서비스들
+const conversationStarterService_1 = require("./services/conversationStarterService");
+const emotionExchangeService_1 = require("./services/emotionExchangeService");
+const messageTemplateService_1 = require("./services/messageTemplateService");
+const valueAnalysisService_1 = require("./services/valueAnalysisService");
 // OpenAI 초기화 (환경변수에서 API 키 가져오기)
 const openai = new openai_1.OpenAI({
     apiKey: process.env.OPENAI_API_KEY || '',
@@ -569,6 +574,98 @@ exports.createGrowthProgram = functions.https.onCall(async (data, context) => {
     catch (error) {
         console.error('성장 프로그램 생성 오류:', error);
         throw new functions.https.HttpsError('internal', '프로그램 생성 중 오류가 발생했습니다.');
+    }
+});
+/**
+ * 💬 대화 스타터 카드 추천 함수
+ * Phase 2: 소통 개선 도구
+ */
+exports.getConversationStarters = functions.https.onCall(async (data, context) => {
+    try {
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+        }
+        const { groupId, context: conversationContext } = data;
+        const conversationService = new conversationStarterService_1.ConversationStarterService();
+        const starters = await conversationService.getRecommendedStarters(groupId, conversationContext);
+        return {
+            success: true,
+            starters,
+            version: '2.0'
+        };
+    }
+    catch (error) {
+        console.error('대화 스타터 추천 오류:', error);
+        throw new functions.https.HttpsError('internal', '대화 스타터 추천 중 오류가 발생했습니다.');
+    }
+});
+/**
+ * 📝 감정 교환 일기 생성 함수
+ * Phase 2: 소통 개선 도구
+ */
+exports.createEmotionDiary = functions.https.onCall(async (data, context) => {
+    try {
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+        }
+        const { groupId, creatorId, diaryData } = data;
+        const emotionService = new emotionExchangeService_1.EmotionExchangeService();
+        const diary = await emotionService.createEmotionDiary(groupId, creatorId, diaryData);
+        return {
+            success: true,
+            diary,
+            version: '2.0'
+        };
+    }
+    catch (error) {
+        console.error('감정 교환 일기 생성 오류:', error);
+        throw new functions.https.HttpsError('internal', '감정 교환 일기 생성 중 오류가 발생했습니다.');
+    }
+});
+/**
+ * 💌 개인화된 메시지 생성 함수
+ * Phase 2: 소통 개선 도구
+ */
+exports.createPersonalizedMessage = functions.https.onCall(async (data, context) => {
+    try {
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+        }
+        const { templateId, senderId, recipientId, variables, groupId } = data;
+        const messageService = new messageTemplateService_1.MessageTemplateService();
+        const message = await messageService.createPersonalizedMessage(templateId, senderId, recipientId, variables, groupId);
+        return {
+            success: true,
+            message,
+            version: '2.0'
+        };
+    }
+    catch (error) {
+        console.error('개인화된 메시지 생성 오류:', error);
+        throw new functions.https.HttpsError('internal', '개인화된 메시지 생성 중 오류가 발생했습니다.');
+    }
+});
+/**
+ * 🎯 가치관 분석 함수
+ * Phase 2: 소통 개선 도구
+ */
+exports.analyzeGroupValues = functions.https.onCall(async (data, context) => {
+    try {
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+        }
+        const { groupId } = data;
+        const valueService = new valueAnalysisService_1.ValueAnalysisService();
+        const analysis = await valueService.analyzeGroupValues(groupId);
+        return {
+            success: true,
+            analysis,
+            version: '2.0'
+        };
+    }
+    catch (error) {
+        console.error('가치관 분석 오류:', error);
+        throw new functions.https.HttpsError('internal', '가치관 분석 중 오류가 발생했습니다.');
     }
 });
 // Express 앱을 Cloud Function으로 export

@@ -12,6 +12,12 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
+// Phase 2: 소통 개선 도구 서비스들
+import { ConversationStarterService } from './services/conversationStarterService';
+import { EmotionExchangeService } from './services/emotionExchangeService';
+import { MessageTemplateService } from './services/messageTemplateService';
+import { ValueAnalysisService } from './services/valueAnalysisService';
+
 // OpenAI 초기화 (환경변수에서 API 키 가져오기)
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
@@ -648,6 +654,120 @@ export const createGrowthProgram = functions.https.onCall(async (data, context) 
   } catch (error) {
     console.error('성장 프로그램 생성 오류:', error);
     throw new functions.https.HttpsError('internal', '프로그램 생성 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 💬 대화 스타터 카드 추천 함수
+ * Phase 2: 소통 개선 도구
+ */
+export const getConversationStarters = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { groupId, context: conversationContext } = data;
+    
+    const conversationService = new ConversationStarterService();
+    const starters = await conversationService.getRecommendedStarters(groupId, conversationContext);
+    
+    return { 
+      success: true, 
+      starters,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('대화 스타터 추천 오류:', error);
+    throw new functions.https.HttpsError('internal', '대화 스타터 추천 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 📝 감정 교환 일기 생성 함수
+ * Phase 2: 소통 개선 도구
+ */
+export const createEmotionDiary = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { groupId, creatorId, diaryData } = data;
+    
+    const emotionService = new EmotionExchangeService();
+    const diary = await emotionService.createEmotionDiary(groupId, creatorId, diaryData);
+    
+    return { 
+      success: true, 
+      diary,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('감정 교환 일기 생성 오류:', error);
+    throw new functions.https.HttpsError('internal', '감정 교환 일기 생성 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 💌 개인화된 메시지 생성 함수
+ * Phase 2: 소통 개선 도구
+ */
+export const createPersonalizedMessage = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { templateId, senderId, recipientId, variables, groupId } = data;
+    
+    const messageService = new MessageTemplateService();
+    const message = await messageService.createPersonalizedMessage(
+      templateId, 
+      senderId, 
+      recipientId, 
+      variables, 
+      groupId
+    );
+    
+    return { 
+      success: true, 
+      message,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('개인화된 메시지 생성 오류:', error);
+    throw new functions.https.HttpsError('internal', '개인화된 메시지 생성 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🎯 가치관 분석 함수
+ * Phase 2: 소통 개선 도구
+ */
+export const analyzeGroupValues = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { groupId } = data;
+    
+    const valueService = new ValueAnalysisService();
+    const analysis = await valueService.analyzeGroupValues(groupId);
+    
+    return { 
+      success: true, 
+      analysis,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('가치관 분석 오류:', error);
+    throw new functions.https.HttpsError('internal', '가치관 분석 중 오류가 발생했습니다.');
   }
 });
 
