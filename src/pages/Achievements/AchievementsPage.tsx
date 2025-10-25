@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@store/AuthContext';
-// TODO: Firebase imports will be used when implementing actual achievement loading
-// import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
-// import { db } from '@config/firebase';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import toast from 'react-hot-toast';
 import { 
   Award, 
@@ -19,8 +17,15 @@ import {
   Sparkles,
   TrendingUp,
   CheckCircle,
-  Lock
+  Lock,
+  Gift,
+  MessageCircle,
+  Flower
 } from 'lucide-react';
+import { AIWarning } from '../../components/Common/AIWarning';
+import { useAIWarning } from '../../hooks/useAIWarning';
+import LoadingSpinner from '../../components/Common/LoadingSpinner';
+import ErrorMessage from '../../components/Common/ErrorMessage';
 
 interface Achievement {
   id: string;
@@ -68,11 +73,21 @@ interface UserStats {
  */
 const AchievementsPage: React.FC = () => {
   const { user } = useAuth();
+  const functions = getFunctions();
   
   const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [badgeProgress, setBadgeProgress] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<'all' | Achievement['category']>('all');
   const [showUnlockedOnly, setShowUnlockedOnly] = useState(false);
+  const [recentlyUnlocked, setRecentlyUnlocked] = useState<any[]>([]);
+
+  // AI 경고 시스템
+  const aiWarning = useAIWarning({
+    analysisType: 'general',
+    severity: 'low',
+    includeEmergencyContact: false
+  });
 
   useEffect(() => {
     if (user) {
@@ -85,24 +100,39 @@ const AchievementsPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // 사용자 통계 및 성취 데이터 로드
-      const stats = await calculateUserStats();
-      setUserStats(stats);
+      // Firebase Functions를 통한 실제 사용자 통계 로드
+      const getUserStats = httpsCallable(functions, 'getUserStats');
+      const getUserBadgeProgress = httpsCallable(functions, 'getUserBadgeProgress');
+      
+      const [statsResult, progressResult] = await Promise.all([
+        getUserStats({ userId: user.uid }),
+        getUserBadgeProgress({ userId: user.uid })
+      ]);
+      
+      const statsData = statsResult.data as { success: boolean; userStats: UserStats };
+      const progressData = progressResult.data as { success: boolean; badgeProgress: any[] };
+      
+      if (statsData.success && progressData.success) {
+        setUserStats(statsData.userStats);
+        setBadgeProgress(progressData.badgeProgress);
+        toast.success('성취 정보를 불러왔습니다!');
+      } else {
+        // 폴백으로 목업 데이터 사용
+        const mockStats = getMockUserStats();
+        setUserStats(mockStats);
+        setBadgeProgress([]);
+      }
     } catch (error) {
       console.error('사용자 통계 로드 오류:', error);
       toast.error('통계를 불러오는 중 오류가 발생했습니다.');
       
       // 폴백 데이터
-      setUserStats(getMockUserStats());
+      const mockStats = getMockUserStats();
+      setUserStats(mockStats);
+      setBadgeProgress([]);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const calculateUserStats = async (): Promise<UserStats> => {
-    // TODO: 실제 구현에서는 Firestore에서 사용자 데이터 수집
-    // 임시로 목업 데이터 반환
-    return getMockUserStats();
   };
 
   const getMockUserStats = (): UserStats => {
@@ -291,33 +321,11 @@ const AchievementsPage: React.FC = () => {
   }) || [];
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-soft p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">성취 데이터를 불러오고 있습니다...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="성취 데이터를 불러오고 있습니다..." />;
   }
 
   if (!userStats) {
-    return (
-      <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-soft p-8 text-center">
-          <Award className="w-16 h-16 text-gray-400 mx-auto mb-6" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            데이터를 불러올 수 없습니다
-          </h2>
-          <button
-            onClick={loadUserStats}
-            className="btn-primary w-full"
-          >
-            다시 시도
-          </button>
-        </div>
-      </div>
-    );
+    return <ErrorMessage message="성취 데이터를 불러올 수 없습니다." />;
   }
 
   return (
@@ -575,6 +583,11 @@ const AchievementsPage: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* AI 경고 */}
+        <div className="mt-8">
+          <AIWarning warningData={aiWarning} />
         </div>
       </div>
     </div>

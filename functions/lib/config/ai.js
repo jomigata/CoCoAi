@@ -43,7 +43,7 @@ const functions = __importStar(require("firebase-functions"));
  */
 // OpenAI 클라이언트 초기화
 exports.openai = new openai_1.OpenAI({
-    apiKey: ((_a = functions.config().openai) === null || _a === void 0 ? void 0 : _a.key) || process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY || ((_a = functions.config().openai) === null || _a === void 0 ? void 0 : _a.key) || 'dummy-key-for-build',
 });
 // AI 모델 설정
 exports.AI_MODELS = {

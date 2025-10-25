@@ -18,6 +18,10 @@ import { EmotionExchangeService } from './services/emotionExchangeService';
 import { MessageTemplateService } from './services/messageTemplateService';
 import { ValueAnalysisService } from './services/valueAnalysisService';
 
+// Phase 2 Week 9-10: 게이미피케이션 서비스들
+import { GardenService } from './services/gardenService';
+import { BadgeService } from './services/badgeService';
+
 // OpenAI 초기화 (환경변수에서 API 키 가져오기)
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
@@ -768,6 +772,247 @@ export const analyzeGroupValues = functions.https.onCall(async (data, context) =
   } catch (error) {
     console.error('가치관 분석 오류:', error);
     throw new functions.https.HttpsError('internal', '가치관 분석 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🌱 정원 정보 조회 함수
+ * 사용자의 관계의 정원 상태를 조회합니다.
+ */
+export const getUserGarden = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId } = data;
+    
+    const gardenService = new GardenService();
+    const garden = await gardenService.getUserGarden(userId);
+    
+    return { 
+      success: true, 
+      garden,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('정원 정보 조회 오류:', error);
+    throw new functions.https.HttpsError('internal', '정원 정보 조회 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🌱 정원 액션 수행 함수
+ * 물주기, 심기, 수확 등의 정원 액션을 수행합니다.
+ */
+export const performGardenAction = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId, action } = data;
+    
+    const gardenService = new GardenService();
+    const result = await gardenService.performGardenAction(userId, action);
+    
+    return { 
+      success: true, 
+      garden: result.garden,
+      events: result.events,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('정원 액션 수행 오류:', error);
+    throw new functions.https.HttpsError('internal', '정원 액션 수행 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🌱 그룹 활동 정원 업데이트 함수
+ * 그룹 활동과 연동하여 정원을 업데이트합니다.
+ */
+export const updateGardenFromGroupActivity = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId, groupId, activityType } = data;
+    
+    const gardenService = new GardenService();
+    const result = await gardenService.updateGardenFromGroupActivity(userId, groupId, activityType);
+    
+    return { 
+      success: true, 
+      garden: result.garden,
+      events: result.events,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('그룹 활동 정원 업데이트 오류:', error);
+    throw new functions.https.HttpsError('internal', '그룹 활동 정원 업데이트 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🌱 식물 성장 시뮬레이션 함수
+ * AI 기반 식물 성장을 시뮬레이션합니다.
+ */
+export const simulatePlantGrowth = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId } = data;
+    
+    const gardenService = new GardenService();
+    const result = await gardenService.simulatePlantGrowth(userId);
+    
+    return { 
+      success: true, 
+      events: result.events,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('식물 성장 시뮬레이션 오류:', error);
+    throw new functions.https.HttpsError('internal', '식물 성장 시뮬레이션 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🏆 사용자 통계 및 뱃지 정보 조회 함수
+ */
+export const getUserStats = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId } = data;
+    
+    const badgeService = new BadgeService();
+    const userStats = await badgeService.getUserStats(userId);
+    
+    return { 
+      success: true, 
+      userStats,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('사용자 통계 조회 오류:', error);
+    throw new functions.https.HttpsError('internal', '사용자 통계 조회 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🏆 뱃지 진행 상황 조회 함수
+ */
+export const getUserBadgeProgress = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId } = data;
+    
+    const badgeService = new BadgeService();
+    const badgeProgress = await badgeService.getUserBadgeProgress(userId);
+    
+    return { 
+      success: true, 
+      badgeProgress,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('뱃지 진행 상황 조회 오류:', error);
+    throw new functions.https.HttpsError('internal', '뱃지 진행 상황 조회 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🏆 뱃지 획득 체크 및 업데이트 함수
+ */
+export const checkAndUpdateBadges = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId, activityType, activityData } = data;
+    
+    const badgeService = new BadgeService();
+    const result = await badgeService.checkAndUpdateBadges(userId, activityType, activityData);
+    
+    return { 
+      success: true, 
+      unlockedBadges: result.unlockedBadges,
+      updatedStats: result.updatedStats,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('뱃지 체크 및 업데이트 오류:', error);
+    throw new functions.https.HttpsError('internal', '뱃지 체크 및 업데이트 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🏆 칭찬 릴레이 전송 함수
+ */
+export const sendPraise = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId, targetUserId, praiseMessage } = data;
+    
+    const badgeService = new BadgeService();
+    const result = await badgeService.sendPraise(userId, targetUserId, praiseMessage);
+    
+    return { 
+      success: true, 
+      points: result.points,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('칭찬 전송 오류:', error);
+    throw new functions.https.HttpsError('internal', '칭찬 전송 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🏆 칭찬 받은 목록 조회 함수
+ */
+export const getReceivedPraises = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId } = data;
+    
+    const badgeService = new BadgeService();
+    const praises = await badgeService.getReceivedPraises(userId);
+    
+    return { 
+      success: true, 
+      praises,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('칭찬 목록 조회 오류:', error);
+    throw new functions.https.HttpsError('internal', '칭찬 목록 조회 중 오류가 발생했습니다.');
   }
 });
 

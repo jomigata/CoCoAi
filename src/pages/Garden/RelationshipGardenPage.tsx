@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@store/AuthContext';
-// TODO: Firebase imports will be used when implementing actual garden data
-// import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
-// import { db } from '@config/firebase';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import toast from 'react-hot-toast';
 import { 
   Flower, 
@@ -18,8 +16,16 @@ import {
   Leaf,
   Cherry,
   RefreshCw,
-  Info
+  Info,
+  Plus,
+  Droplets,
+  Scissors,
+  Package
 } from 'lucide-react';
+import { AIWarning } from '../../components/Common/AIWarning';
+import { useAIWarning } from '../../hooks/useAIWarning';
+import LoadingSpinner from '../../components/Common/LoadingSpinner';
+import ErrorMessage from '../../components/Common/ErrorMessage';
 
 interface Plant {
   id: string;
@@ -78,12 +84,22 @@ interface GardenAction {
  */
 const RelationshipGardenPage: React.FC = () => {
   const { user } = useAuth();
+  const functions = getFunctions();
   
   const [garden, setGarden] = useState<Garden | null>(null);
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
   const [availableActions, setAvailableActions] = useState<GardenAction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [isPerformingAction, setIsPerformingAction] = useState(false);
+  const [growthEvents, setGrowthEvents] = useState<any[]>([]);
+
+  // AI 경고 시스템
+  const aiWarning = useAIWarning({
+    analysisType: 'general',
+    severity: 'low',
+    includeEmergencyContact: false
+  });
 
   useEffect(() => {
     if (user) {
@@ -96,16 +112,99 @@ const RelationshipGardenPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // 실제 구현에서는 Firestore에서 정원 데이터 로드
-      // 임시로 목업 데이터 사용
-      const mockGarden = getMockGarden(user.uid);
-      setGarden(mockGarden);
-      setAvailableActions(getAvailableActions(mockGarden));
+      // Firebase Functions를 통한 실제 정원 데이터 로드
+      const getUserGarden = httpsCallable(functions, 'getUserGarden');
+      const result = await getUserGarden({ userId: user.uid });
+      const data = result.data as { success: boolean; garden: Garden };
+      
+      if (data.success && data.garden) {
+        setGarden(data.garden);
+        setAvailableActions(getAvailableActions(data.garden));
+        toast.success('정원을 불러왔습니다!');
+      } else {
+        // 폴백으로 목업 데이터 사용
+        const mockGarden = getMockGarden(user.uid);
+        setGarden(mockGarden);
+        setAvailableActions(getAvailableActions(mockGarden));
+      }
     } catch (error) {
       console.error('정원 로드 오류:', error);
       toast.error('정원을 불러오는 중 오류가 발생했습니다.');
+      
+      // 폴백으로 목업 데이터 사용
+      const mockGarden = getMockGarden(user.uid);
+      setGarden(mockGarden);
+      setAvailableActions(getAvailableActions(mockGarden));
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const performGardenAction = async (action: GardenAction) => {
+    if (!user || !garden || isPerformingAction) return;
+
+    setIsPerformingAction(true);
+    try {
+      // Firebase Functions를 통한 실제 정원 액션 수행
+      const performAction = httpsCallable(functions, 'performGardenAction');
+      const result = await performAction({
+        userId: user.uid,
+        action: {
+          type: action.type,
+          plantId: action.plantId,
+          plantType: action.type === 'plant' ? 'flower' : undefined,
+          points: action.cost,
+          description: action.effect
+        }
+      });
+      
+      const data = result.data as { success: boolean; garden: Garden; events: any[] };
+      
+      if (data.success) {
+        setGarden(data.garden);
+        setAvailableActions(getAvailableActions(data.garden));
+        
+        // 성장 이벤트 표시
+        if (data.events && data.events.length > 0) {
+          setGrowthEvents(data.events);
+          data.events.forEach(event => {
+            toast.success(event.message);
+          });
+        }
+        
+        toast.success(`${action.effect} 완료!`);
+      }
+      
+    } catch (error) {
+      console.error('정원 액션 수행 오류:', error);
+      toast.error('액션 수행 중 오류가 발생했습니다.');
+    } finally {
+      setIsPerformingAction(false);
+    }
+  };
+
+  const simulateGrowth = async () => {
+    if (!user) return;
+
+    try {
+      const simulateGrowth = httpsCallable(functions, 'simulatePlantGrowth');
+      const result = await simulateGrowth({ userId: user.uid });
+      const data = result.data as { success: boolean; events: any[] };
+      
+      if (data.success && data.events && data.events.length > 0) {
+        setGrowthEvents(data.events);
+        data.events.forEach(event => {
+          toast.success(event.message);
+        });
+        // 정원 다시 로드
+        loadGarden();
+      } else {
+        toast.info('아직 성장할 식물이 없습니다.');
+      }
+      
+    } catch (error) {
+      console.error('성장 시뮬레이션 오류:', error);
+      toast.error('성장 시뮬레이션 중 오류가 발생했습니다.');
     }
   };
 
@@ -328,36 +427,11 @@ const RelationshipGardenPage: React.FC = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-soft p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">정원을 불러오고 있습니다...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="정원을 불러오고 있습니다..." />;
   }
 
   if (!garden) {
-    return (
-      <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-soft p-8 text-center">
-          <Flower className="w-16 h-16 text-gray-400 mx-auto mb-6" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            정원을 만들어보세요
-          </h2>
-          <p className="text-gray-600 mb-6">
-            관계의 정원에서 소중한 인연들을 가꿔보세요.
-          </p>
-          <button
-            onClick={loadGarden}
-            className="btn-primary w-full"
-          >
-            정원 시작하기
-          </button>
-        </div>
-      </div>
-    );
+    return <ErrorMessage message="정원을 불러올 수 없습니다." />;
   }
 
   return (
@@ -371,9 +445,29 @@ const RelationshipGardenPage: React.FC = () => {
           <h1 className="text-display-medium text-gray-900 mb-4">
             관계의 정원
           </h1>
-          <p className="text-body-large text-gray-600 max-w-2xl mx-auto">
+          <p className="text-body-large text-gray-600 max-w-2xl mx-auto mb-6">
             긍정적인 상호작용으로 아름다운 관계의 정원을 가꿔보세요.
           </p>
+          
+          {/* 성장 시뮬레이션 버튼 */}
+          <div className="flex justify-center gap-4">
+            <button
+              onClick={simulateGrowth}
+              disabled={isPerformingAction}
+              className="flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white rounded-lg transition-colors"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              성장 시뮬레이션
+            </button>
+            <button
+              onClick={() => loadGarden()}
+              disabled={isLoading}
+              className="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white rounded-lg transition-colors"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              새로고침
+            </button>
+          </div>
         </div>
 
         <div className="max-w-6xl mx-auto">
@@ -540,8 +634,8 @@ const RelationshipGardenPage: React.FC = () => {
                       {availableActions.map(action => (
                         <button
                           key={action.id}
-                          onClick={() => handlePlantAction(action, selectedPlant)}
-                          disabled={!action.available}
+                          onClick={() => performGardenAction(action)}
+                          disabled={!action.available || isPerformingAction}
                           className={`w-full btn-outline text-sm disabled:opacity-50 disabled:cursor-not-allowed ${
                             action.type === 'water' ? 'border-blue-300 text-blue-600 hover:bg-blue-50' :
                             action.type === 'fertilize' ? 'border-purple-300 text-purple-600 hover:bg-purple-50' :
@@ -549,8 +643,9 @@ const RelationshipGardenPage: React.FC = () => {
                           }`}
                         >
                           {action.type === 'water' && <Droplets className="w-4 h-4 mr-2" />}
-                          {action.type === 'fertilize' && <Sparkles className="w-4 h-4 mr-2" />}
-                          {action.type === 'plant' && <Leaf className="w-4 h-4 mr-2" />}
+                          {action.type === 'fertilize' && <Package className="w-4 h-4 mr-2" />}
+                          {action.type === 'plant' && <Plus className="w-4 h-4 mr-2" />}
+                          {action.type === 'harvest' && <Scissors className="w-4 h-4 mr-2" />}
                           
                           {action.type === 'water' ? '물주기' :
                            action.type === 'fertilize' ? '영양분 주기' :
@@ -625,6 +720,33 @@ const RelationshipGardenPage: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* 성장 이벤트 표시 */}
+        {growthEvents.length > 0 && (
+          <div className="fixed top-4 right-4 z-50 space-y-2">
+            {growthEvents.map((event, index) => (
+              <div
+                key={index}
+                className="bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg animate-pulse"
+              >
+                <div className="flex items-center">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  <span className="font-medium">{event.message}</span>
+                </div>
+                {event.rewards && (
+                  <div className="text-sm mt-1 opacity-90">
+                    +{event.rewards.experience} 경험치, +{event.rewards.points} 포인트
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* AI 경고 */}
+        <div className="mt-8">
+          <AIWarning warningData={aiWarning} />
+        </div>
       </div>
     </div>
   );
