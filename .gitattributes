@@ -1,0 +1,31 @@
+# Git attributes for proper text handling
+* text=auto eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.jsx text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.xml text eol=lf
+
+# Ensure proper encoding for Korean text
+*.md charset=utf-8
+*.txt charset=utf-8
+*.json charset=utf-8
+*.yml charset=utf-8
+*.yaml charset=utf-8
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary

@@ -8,7 +8,7 @@ import * as functions from 'firebase-functions';
 
 // OpenAI 클라이언트 초기화
 export const openai = new OpenAI({
-  apiKey: functions.config().openai?.key || process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || functions.config().openai?.key || 'dummy-key-for-build',
 });
 
 // AI 모델 설정
