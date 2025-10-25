@@ -31,6 +31,7 @@ const Sidebar: React.FC = () => {
     { name: '그룹', href: '/groups', icon: Users },
     { name: '코코 챗봇', href: '/chat', icon: Bot },
     { name: '프로파일링', href: '/profiling', icon: Brain },
+    { name: '마음 지도', href: '/mind-map', icon: Brain },
     { name: '상담', href: '/counseling', icon: MessageCircle },
     { name: '프로필', href: '/profile', icon: User },
   ];

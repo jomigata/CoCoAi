@@ -17,6 +17,7 @@ const ProfilePage = lazy(() => import('@pages/Profile/ProfilePage'));
 // 새로운 페이지들 - 동적 import
 const PersonalProfilingPage = lazy(() => import('@pages/Profiling/PersonalProfilingPage'));
 const ProfilingResultsPage = lazy(() => import('@pages/Profiling/ProfilingResultsPage'));
+const MindMapPage = lazy(() => import('@pages/MindMap/MindMapPage'));
 const GroupsPage = lazy(() => import('@pages/Groups/GroupsPage'));
 const CreateGroupPage = lazy(() => import('@pages/Groups/CreateGroupPage'));
 const GroupInvitePage = lazy(() => import('@pages/Groups/GroupInvitePage'));
@@ -76,10 +77,11 @@ function App() {
                       <Route path="/counseling" element={<CounselingPage />} />
                       <Route path="/profile" element={<ProfilePage />} />
                       
-                      {/* 새로운 기능 라우트 */}
-                      <Route path="/profiling" element={<PersonalProfilingPage />} />
-                      <Route path="/profile/results" element={<ProfilingResultsPage />} />
-                      <Route path="/groups" element={<GroupsPage />} />
+                  {/* 새로운 기능 라우트 */}
+                  <Route path="/profiling" element={<PersonalProfilingPage />} />
+                  <Route path="/profile/results" element={<ProfilingResultsPage />} />
+                  <Route path="/mind-map" element={<MindMapPage />} />
+                  <Route path="/groups" element={<GroupsPage />} />
                       <Route path="/groups/create" element={<CreateGroupPage />} />
                       <Route path="/groups/join" element={<GroupInvitePage />} />
                       <Route path="/groups/:groupId/diagnosis" element={<GroupDiagnosisPage />} />
