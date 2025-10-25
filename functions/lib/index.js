@@ -35,7 +35,6 @@ var __importStar = (this && this.__importStar) || (function () {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.api = exports.createGrowthProgram = exports.analyzeDream = exports.generatePersonalGrowthReport = exports.saveRecommendationFeedback = exports.generateRecommendations = exports.analyzeMoodPatterns = exports.processAIChat = exports.sendGroupInvitation = exports.generateGroupReport = exports.analyzeProfilingResults = void 0;
 const functions = __importStar(require("firebase-functions"));
@@ -52,7 +51,7 @@ const db = admin.firestore();
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 // OpenAI 초기화 (환경변수에서 API 키 가져오기)
 const openai = new openai_1.OpenAI({
-    apiKey: ((_a = functions.config().openai) === null || _a === void 0 ? void 0 : _a.key) || process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY || '',
 });
 // CORS 설정
 const corsHandler = (0, cors_1.default)({ origin: true });

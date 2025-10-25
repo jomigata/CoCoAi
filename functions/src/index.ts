@@ -14,7 +14,7 @@ const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
 // OpenAI 초기화 (환경변수에서 API 키 가져오기)
 const openai = new OpenAI({
-  apiKey: functions.config().openai?.key || process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || '',
 });
 
 // CORS 설정
