@@ -47,7 +47,6 @@ const MindMapPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedNode, setSelectedNode] = useState<any>(null);
-  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
 
   const aiWarning = useAIWarning({
     analysisType: 'profiling',
@@ -115,7 +114,7 @@ const MindMapPage: React.FC = () => {
     setSelectedNode(node);
   };
 
-  const handleNodeHover = (node: any) => {
+  const handleNodeHover = () => {
     // 호버 효과는 컴포넌트 내부에서 처리
   };
 
