@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@store/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@config/firebase';
 import { getFunctions, httpsCallable } from 'firebase/functions';

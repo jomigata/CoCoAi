@@ -27,14 +27,6 @@ interface ProfilingQuestion {
   required: boolean;
 }
 
-interface ProfilingData {
-  selfEsteem: number;
-  stressCoping: string[];
-  relationshipPattern: string;
-  coreValues: string[];
-  strengths: string[];
-}
-
 const PersonalProfilingPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
