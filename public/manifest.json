@@ -1,0 +1,131 @@
+{
+  "name": "WizCoCo - CoCo Ai 심리 케어 플랫폼",
+  "short_name": "CoCo Ai",
+  "description": "AI 기반 심리 케어 플랫폼으로 마음의 건강을 돌보는 서비스",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ko",
+  "categories": ["health", "lifestyle", "medical"],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "AI 챗봇 상담",
+      "short_name": "챗봇",
+      "description": "24시간 AI 챗봇과 상담하기",
+      "url": "/chat",
+      "icons": [
+        {
+          "src": "/icons/chat-icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "개인 프로파일링",
+      "short_name": "프로파일링",
+      "description": "개인 심리 분석 받기",
+      "url": "/profiling",
+      "icons": [
+        {
+          "src": "/icons/profile-icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "그룹 관리",
+      "short_name": "그룹",
+      "description": "그룹 생성 및 관리",
+      "url": "/groups",
+      "icons": [
+        {
+          "src": "/icons/group-icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "데일리 마음 기록",
+      "short_name": "마음 기록",
+      "description": "오늘의 감정 기록하기",
+      "url": "/mood",
+      "icons": [
+        {
+          "src": "/icons/mood-icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "홈 화면"
+    },
+    {
+      "src": "/screenshots/mobile-home.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "모바일 홈 화면"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
