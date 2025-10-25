@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@store/AuthContext';
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { Brain, Download, Share2, RefreshCw, Settings, Eye } from 'lucide-react';
+import { Brain, Download, Share2, RefreshCw } from 'lucide-react';
 import InteractiveMindMap from '@components/MindMap/InteractiveMindMap';
 import LoadingSpinner from '@components/Common/LoadingSpinner';
 import AIWarning from '@components/Common/AIWarning';

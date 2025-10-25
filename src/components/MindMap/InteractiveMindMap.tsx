@@ -2,14 +2,6 @@ import React, { useRef, useEffect, useState, useMemo } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { 
   Brain, 
-  Heart, 
-  Users, 
-  Target, 
-  Zap, 
-  Shield, 
-  Star, 
-  Compass,
-  Eye,
   ZoomIn,
   ZoomOut,
   RotateCcw,
@@ -287,7 +279,7 @@ const InteractiveMindMap: React.FC<InteractiveMindMapProps> = ({
   }, [isFullscreen]);
 
   // 노드 렌더링 함수
-  const nodeCanvasObject = (node: MindMapNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
+  const nodeCanvasObject = (node: MindMapNode, ctx: CanvasRenderingContext2D) => {
     const label = node.name;
     const fontSize = Math.max(12, node.size * 0.8);
     ctx.font = `${fontSize}px Inter, sans-serif`;
