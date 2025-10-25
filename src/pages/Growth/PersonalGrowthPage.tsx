@@ -203,29 +203,6 @@ const PersonalGrowthPage: React.FC = () => {
     }
   };
 
-  const getGrowthAreaIcon = (area: string) => {
-    const icons = {
-      emotional_regulation: <Heart className="w-5 h-5" />,
-      stress_management: <Zap className="w-5 h-5" />,
-      relationship_skills: <Target className="w-5 h-5" />,
-      self_awareness: <Brain className="w-5 h-5" />,
-      resilience: <Award className="w-5 h-5" />,
-      communication: <Target className="w-5 h-5" />
-    };
-    return icons[area as keyof typeof icons] || <Target className="w-5 h-5" />;
-  };
-
-  const getGrowthAreaName = (area: string) => {
-    const names = {
-      emotional_regulation: '감정 조절',
-      stress_management: '스트레스 관리',
-      relationship_skills: '관계 기술',
-      self_awareness: '자기 인식',
-      resilience: '회복력',
-      communication: '소통 능력'
-    };
-    return names[area as keyof typeof names] || area;
-  };
 
   const getCategoryIcon = (category: string) => {
     const icons = {

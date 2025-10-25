@@ -355,7 +355,7 @@ const GroupReportsPage: React.FC = () => {
             <div className="text-center mt-4">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                 <Brain className="w-4 h-4 mr-1" />
-                AI 분석 엔진 v{selectedReport.reportResult.aiWarning.version}
+                AI 분석 엔진 v{selectedReport.reportResult?.aiWarning?.version}
               </span>
             </div>
           )}
