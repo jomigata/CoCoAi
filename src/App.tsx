@@ -19,6 +19,7 @@ import CreateGroupPage from '@pages/Groups/CreateGroupPage';
 import GroupInvitePage from '@pages/Groups/GroupInvitePage';
 import GroupDiagnosisPage from '@pages/Groups/GroupDiagnosisPage';
 import GroupReportsPage from '@pages/Groups/GroupReportsPage';
+import WeeklyReportPage from '@pages/Groups/WeeklyReportPage';
 import DailyMoodPage from '@pages/Mood/DailyMoodPage';
 import ChatPage from '@pages/Chat/ChatPage';
 import RecommendationsPage from '@pages/Recommendations/RecommendationsPage';
@@ -68,6 +69,7 @@ function App() {
                 <Route path="/groups/join" element={<GroupInvitePage />} />
                 <Route path="/groups/:groupId/diagnosis" element={<GroupDiagnosisPage />} />
                 <Route path="/groups/:groupId/reports" element={<GroupReportsPage />} />
+                <Route path="/groups/:groupId/weekly-report" element={<WeeklyReportPage />} />
                 <Route path="/mood" element={<DailyMoodPage />} />
                 <Route path="/chat" element={<ChatPage />} />
                 <Route path="/recommendations" element={<RecommendationsPage />} />
