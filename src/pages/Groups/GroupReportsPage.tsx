@@ -339,16 +339,26 @@ const GroupReportsPage: React.FC = () => {
           </p>
         </div>
 
-        {/* AI 경고 시스템 */}
+        {/* 고도화된 AI 경고 시스템 */}
         <div className="mb-8">
           <AIWarning
             message={selectedReport?.reportResult.aiWarning.message || aiWarning.message}
             details={selectedReport?.reportResult.aiWarning.details || aiWarning.details}
             timestamp={selectedReport?.reportResult.aiWarning.timestamp || aiWarning.timestamp}
             type="warning"
-            showDetails={false}
+            showDetails={true}
             className="max-w-4xl mx-auto"
           />
+          
+          {/* 분석 버전 표시 */}
+          {selectedReport?.reportResult.aiWarning.version && (
+            <div className="text-center mt-4">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                <Brain className="w-4 h-4 mr-1" />
+                AI 분석 엔진 v{selectedReport.reportResult.aiWarning.version}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="max-w-6xl mx-auto">

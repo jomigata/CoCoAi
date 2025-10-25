@@ -5,9 +5,12 @@ import { OpenAI } from 'openai';
 import cors from 'cors';
 import express from 'express';
 
-// Firebase Admin 초기화
-admin.initializeApp();
+// Firebase Admin 초기화 (중복 방지)
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
 const db = admin.firestore();
+const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
 
 // OpenAI 초기화 (환경변수에서 API 키 가져오기)
 const openai = new OpenAI({
@@ -90,8 +93,8 @@ export const analyzeProfilingResults = functions.https.onCall(async (data, conte
 });
 
 /**
- * 📊 그룹 위클리 리포트 생성 함수
- * 멤버들의 데일리 기록을 교차 분석
+ * 📊 고도화된 그룹 위클리 리포트 생성 함수 (v2.0)
+ * 멤버들의 데일리 기록을 교차 분석하여 관계 패턴 인식
  */
 export const generateGroupReport = functions.https.onCall(async (data, context) => {
   try {
@@ -101,7 +104,7 @@ export const generateGroupReport = functions.https.onCall(async (data, context) 
 
     const { groupId, weekStartDate } = data;
     
-    // 그룹 멤버들의 해당 주 데일리 기록 수집
+    // 그룹 정보 및 멤버 데이터 수집
     const groupDoc = await db.collection('groups').doc(groupId).get();
     if (!groupDoc.exists) {
       throw new functions.https.HttpsError('not-found', '그룹을 찾을 수 없습니다.');
@@ -110,9 +113,24 @@ export const generateGroupReport = functions.https.onCall(async (data, context) 
     const groupData = groupDoc.data();
     const memberIds = groupData?.members || [];
     
+    // 멤버 프로필 정보 수집
+    const memberProfiles = [];
+    for (const memberId of memberIds) {
+      const userDoc = await db.collection('users').doc(memberId).get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        memberProfiles.push({
+          id: memberId,
+          name: userData?.displayName || '익명',
+          personalProfile: userData?.personalProfile || null
+        });
+      }
+    }
+    
     // 각 멤버의 주간 감정 기록 수집
     const weeklyRecords: any[] = [];
     for (const memberId of memberIds) {
+      const memberProfile = memberProfiles.find(p => p.id === memberId);
       const recordsQuery = await db
         .collection('mood_records')
         .doc(memberId)
@@ -123,49 +141,95 @@ export const generateGroupReport = functions.https.onCall(async (data, context) 
       
       const memberRecords = recordsQuery.docs.map(doc => ({
         memberId,
-        ...doc.data()
+        memberName: memberProfile?.name || '익명',
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date()
       }));
       
       weeklyRecords.push(...memberRecords);
     }
 
-    // AI 기반 그룹 분석
-    const groupAnalysisPrompt = `
-    당신은 관계 심리학 전문가입니다. 다음 그룹의 주간 감정 기록을 분석해주세요:
+    // 고도화된 그룹 분석 서비스 사용
+    const { GroupAnalysisService } = await import('./services/groupAnalysisService');
+    const analysisService = new GroupAnalysisService();
     
-    그룹 정보: ${JSON.stringify(groupData)}
-    주간 기록: ${JSON.stringify(weeklyRecords)}
+    // 1. 멤버 간 감정 데이터 교차 분석
+    const crossAnalysis = await analysisService.performCrossAnalysis(groupId, weeklyRecords);
     
-    다음 항목들을 분석해주세요:
-    1. 그룹 전체 감정 온도 (1-10점)
-    2. 각 멤버별 주요 감정 패턴
-    3. 그룹 내 감정 연결고리 발견사항
-    4. 관계 개선을 위한 맞춤형 조언 (멤버별 3가지씩)
+    // 2. 관계 패턴 인식
+    const relationshipPatterns = await analysisService.recognizeRelationshipPatterns(
+      crossAnalysis, 
+      groupData?.type || 'general',
+      memberProfiles
+    );
     
-    ⚠️ 이 분석은 AI 기반이며, 실제 관계의 복잡성을 완전히 반영하지 못할 수 있습니다.
+    // 3. 멤버별 개인화된 조언 생성
+    const personalizedAdvice: any = {};
+    for (const memberProfile of memberProfiles) {
+      const advice = await analysisService.generatePersonalizedAdvice(
+        memberProfile.id,
+        memberProfile.name,
+        crossAnalysis,
+        relationshipPatterns,
+        {
+          groupType: groupData?.type,
+          groupName: groupData?.name,
+          memberCount: memberIds.length
+        }
+      );
+      personalizedAdvice[memberProfile.id] = advice;
+    }
     
-    JSON 형태로 응답해주세요.
-    `;
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "user", content: groupAnalysisPrompt }],
-      temperature: 0.7,
-    });
-
-    const reportResult = JSON.parse(completion.choices[0].message.content || '{}');
-    
-    // AI 편향성 경고 추가
-    reportResult.aiWarning = {
-      message: "⚠️ AI 분석 결과 안내",
-      details: [
-        "이 리포트는 AI 기반 분석으로 제공됩니다.",
-        "실제 관계의 복잡성과 맥락을 완전히 파악하지 못할 수 있습니다.",
-        "개인적인 상황이나 외부 요인이 반영되지 않을 수 있습니다.",
-        "참고용으로 활용하시고, 중요한 결정은 충분한 대화를 통해 해주세요."
-      ],
-      timestamp: new Date().toISOString()
+    // 4. 종합 리포트 구성
+    const reportResult = {
+      // 기본 정보
+      groupInfo: {
+        id: groupId,
+        name: groupData?.name,
+        type: groupData?.type,
+        memberCount: memberIds.length,
+        weekStartDate,
+        generatedAt: new Date().toISOString()
+      },
+      
+      // 교차 분석 결과
+      crossAnalysis,
+      
+      // 관계 패턴
+      relationshipPatterns,
+      
+      // 개인화된 조언
+      personalizedAdvice,
+      
+      // 그룹 요약
+      groupSummary: {
+        overallHarmony: crossAnalysis.groupDynamics.overallHarmony,
+        emotionalStability: crossAnalysis.groupDynamics.emotionalStability,
+        keyInsights: [
+          `그룹 조화도: ${(crossAnalysis.groupDynamics.overallHarmony * 100).toFixed(1)}%`,
+          `감정 안정성: ${(crossAnalysis.groupDynamics.emotionalStability * 100).toFixed(1)}%`,
+          `지지 네트워크: ${crossAnalysis.groupDynamics.supportNetwork.length}명`,
+          `관계 패턴: ${relationshipPatterns.length}개 식별`
+        ]
+      },
+      
+      // AI 편향성 경고 (강화된 버전)
+      aiWarning: {
+        message: "⚠️ 고도화된 AI 분석 결과 안내",
+        details: [
+          "이 리포트는 최신 AI 기술을 활용한 고도화된 분석입니다.",
+          "실제 관계의 복잡성과 개인의 고유한 맥락을 완전히 반영하지 못할 수 있습니다.",
+          "문화적, 개인적 배경에 따른 차이가 충분히 고려되지 않을 수 있습니다.",
+          "AI 분석의 한계를 인정하며, 참고용으로만 활용해주세요.",
+          "중요한 관계 결정은 충분한 대화와 전문가 상담을 통해 해주세요."
+        ],
+        timestamp: new Date().toISOString(),
+        version: "2.0"
+      }
     };
+
+    // 분석 결과 저장
+    await analysisService.saveAnalysisResult(groupId, weekStartDate, reportResult);
 
     // 리포트 저장
     const reportId = `${groupId}_${weekStartDate}`;
@@ -175,13 +239,19 @@ export const generateGroupReport = functions.https.onCall(async (data, context) 
       reportResult,
       memberCount: memberIds.length,
       recordCount: weeklyRecords.length,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+      analysisVersion: '2.0',
+      createdAt: serverTimestamp()
     });
 
-    return { success: true, reportResult, reportId };
+    return { 
+      success: true, 
+      reportResult, 
+      reportId,
+      analysisVersion: '2.0'
+    };
     
   } catch (error) {
-    console.error('그룹 리포트 생성 오류:', error);
+    console.error('고도화된 그룹 리포트 생성 오류:', error);
     throw new functions.https.HttpsError('internal', '리포트 생성 중 오류가 발생했습니다.');
   }
 });
@@ -468,6 +538,116 @@ export const saveRecommendationFeedback = functions.https.onCall(async (data, co
   } catch (error) {
     console.error('추천 피드백 저장 오류:', error);
     throw new functions.https.HttpsError('internal', '피드백 저장 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🌱 개인 성장 리포트 생성 함수 (v2.0)
+ * 월간 감정 패턴 분석 및 실천 가능한 대안 추천
+ */
+export const generatePersonalGrowthReport = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId, month } = data; // month: YYYY-MM 형식
+    
+    // 개인 성장 서비스 사용
+    const { PersonalGrowthService } = await import('./services/personalGrowthService');
+    const growthService = new PersonalGrowthService();
+    
+    // 월간 성장 리포트 생성
+    const growthReport = await growthService.generateMonthlyGrowthReport(userId, month);
+    
+    return { 
+      success: true, 
+      report: growthReport,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('개인 성장 리포트 생성 오류:', error);
+    throw new functions.https.HttpsError('internal', '리포트 생성 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🔮 꿈 기록 AI 해몽 함수
+ * 심리학적 관점에서 꿈 내용 분석
+ */
+export const analyzeDream = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId, dreamContent, dreamDate, emotionalState } = data;
+    
+    // 최근 감정 패턴 조회
+    const recentRecordsQuery = await db
+      .collection('mood_records')
+      .doc(userId)
+      .collection('records')
+      .orderBy('createdAt', 'desc')
+      .limit(7)
+      .get();
+    
+    const recentMoodPatterns = recentRecordsQuery.docs.map(doc => doc.data());
+    
+    // 개인 성장 서비스 사용
+    const { PersonalGrowthService } = await import('./services/personalGrowthService');
+    const growthService = new PersonalGrowthService();
+    
+    // 꿈 분석
+    const dreamAnalysis = await growthService.analyzeDreamRecord(
+      userId,
+      dreamContent,
+      new Date(dreamDate),
+      emotionalState,
+      recentMoodPatterns
+    );
+    
+    return { 
+      success: true, 
+      analysis: dreamAnalysis,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('꿈 해석 분석 오류:', error);
+    throw new functions.https.HttpsError('internal', '꿈 분석 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 📋 실천 체크 프로그램 생성 함수
+ * 개인화된 성장 활동 스케줄 생성
+ */
+export const createGrowthProgram = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { userId, selectedAlternatives } = data;
+    
+    // 개인 성장 서비스 사용
+    const { PersonalGrowthService } = await import('./services/personalGrowthService');
+    const growthService = new PersonalGrowthService();
+    
+    // 실천 체크 프로그램 생성
+    const program = await growthService.createPeriodicCheckProgram(userId, selectedAlternatives);
+    
+    return { 
+      success: true, 
+      program,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('성장 프로그램 생성 오류:', error);
+    throw new functions.https.HttpsError('internal', '프로그램 생성 중 오류가 발생했습니다.');
   }
 });
 

@@ -12,7 +12,8 @@ import {
   Users,
   Brain,
   Heart,
-  Bot
+  Bot,
+  TrendingUp
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
@@ -23,6 +24,7 @@ const Sidebar: React.FC = () => {
     { name: '홈', href: '/', icon: Home },
     { name: '대시보드', href: '/dashboard', icon: BarChart3 },
     { name: '마음 기록', href: '/mood', icon: Heart },
+    { name: '개인 성장', href: '/growth', icon: TrendingUp },
     { name: '그룹', href: '/groups', icon: Users },
     { name: '코코 챗봇', href: '/chat', icon: Bot },
     { name: '프로파일링', href: '/profiling', icon: Brain },

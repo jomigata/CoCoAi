@@ -25,6 +25,7 @@ import RecommendationsPage from '@pages/Recommendations/RecommendationsPage';
 import AchievementsPage from '@pages/Achievements/AchievementsPage';
 import RelationshipGardenPage from '@pages/Garden/RelationshipGardenPage';
 import CounselorMatchingPage from '@pages/Counselor/CounselorMatchingPage';
+import PersonalGrowthPage from '@pages/Growth/PersonalGrowthPage';
 
 // 컨텍스트 임포트
 import { AuthProvider } from '@store/AuthContext';
@@ -66,6 +67,7 @@ function App() {
                 <Route path="/achievements" element={<AchievementsPage />} />
                 <Route path="/garden" element={<RelationshipGardenPage />} />
                 <Route path="/counselor-matching" element={<CounselorMatchingPage />} />
+                <Route path="/growth" element={<PersonalGrowthPage />} />
                 
                 {/* 404 페이지 */}
                 <Route path="*" element={<NotFoundPage />} />

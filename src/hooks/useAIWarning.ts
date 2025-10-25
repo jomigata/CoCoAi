@@ -130,6 +130,15 @@ export const useChatWarning = () => useAIWarning({
 });
 
 /**
+ * 개인 성장 분석용 경고
+ */
+export const usePersonalWarning = () => useAIWarning({ 
+  analysisType: 'profiling', 
+  severity: 'medium',
+  includeEmergencyContact: false 
+});
+
+/**
  * 위기 상황용 고위험 경고
  */
 export const useCrisisWarning = () => useAIWarning({ 
