@@ -44,15 +44,6 @@ interface Comment {
   likes: string[];
 }
 
-interface NewDiaryEntry {
-  title: string;
-  content: string;
-  emotion: string;
-  groupId: string;
-  isPublic: boolean;
-  tags: string[];
-}
-
 /**
  * 💝 감정 교환 일기 페이지
  * 그룹 멤버들과 감정을 공유하고 소통하는 공간
