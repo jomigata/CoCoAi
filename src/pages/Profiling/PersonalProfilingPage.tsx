@@ -36,6 +36,8 @@ const PersonalProfilingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasExistingProfile, setHasExistingProfile] = useState(false);
   const [questions, setQuestions] = useState<ProfilingQuestion[]>([]);
+  const [ageGroup, setAgeGroup] = useState<string>('');
+  const [showAgeSelection, setShowAgeSelection] = useState(true);
 
   // 개인 종합 프로파일링 질문들
   const profilingQuestions: ProfilingQuestion[] = [
@@ -178,8 +180,10 @@ const PersonalProfilingPage: React.FC = () => {
 
   useEffect(() => {
     checkExistingProfile();
-    loadQuestions();
-  }, [user]);
+    if (ageGroup) {
+      loadQuestions();
+    }
+  }, [user, ageGroup]);
 
   const checkExistingProfile = async () => {
     if (!user) return;
@@ -201,9 +205,10 @@ const PersonalProfilingPage: React.FC = () => {
       const functions = getFunctions();
       const getProfilingQuestions = httpsCallable(functions, 'getProfilingQuestions');
       
-      const result = await getProfilingQuestions({ ageGroup: '20s' });
+      const result = await getProfilingQuestions({ ageGroup });
       if ((result.data as any).success) {
         setQuestions((result.data as any).questions);
+        setShowAgeSelection(false);
       }
     } catch (error) {
       console.error('질문 로드 오류:', error);
@@ -255,7 +260,7 @@ const PersonalProfilingPage: React.FC = () => {
       
       const result = await analyzeProfilingResults({
         userId: user.uid,
-        ageGroup: '20s',
+        ageGroup,
         responses
       });
 
@@ -263,7 +268,7 @@ const PersonalProfilingPage: React.FC = () => {
         // 사용자 문서 업데이트
         await setDoc(doc(db, 'users', user.uid), {
           personalProfile: {
-            ageGroup: '20s',
+            ageGroup,
             completedAt: new Date(),
             profileData: (result.data as any).result.scores,
             mindMap: (result.data as any).result.mindMap,
@@ -284,6 +289,60 @@ const PersonalProfilingPage: React.FC = () => {
     }
   };
 
+  const handleAgeGroupSelect = (selectedAgeGroup: string) => {
+    setAgeGroup(selectedAgeGroup);
+  };
+
+  const renderAgeSelection = () => {
+    const ageGroups = [
+      { id: '10s', label: '10대', description: '정체성 형성기' },
+      { id: '20s', label: '20대', description: '성인기 진입' },
+      { id: '30s', label: '30대', description: '안정기' },
+      { id: '40s', label: '40대', description: '중년기' },
+      { id: '50s+', label: '50대+', description: '성숙기' }
+    ];
+
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            🧠 개인 종합 프로파일링
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            연령대를 선택해주세요. 각 연령대별로 맞춤형 질문을 제공합니다.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {ageGroups.map((group) => (
+            <div
+              key={group.id}
+              onClick={() => handleAgeGroupSelect(group.id)}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 cursor-pointer hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-pink-300"
+            >
+              <div className="text-center">
+                <div className="text-2xl font-bold text-pink-500 mb-2">
+                  {group.label}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                  {group.description}
+                </div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  연령대별 특화 질문 제공
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            선택한 연령대에 따라 개인화된 심리 분석을 제공합니다
+          </p>
+        </div>
+      </div>
+    );
+  };
 
   const renderQuestion = () => {
     const question = questions[currentStep];
@@ -429,6 +488,10 @@ const PersonalProfilingPage: React.FC = () => {
         </div>
       </div>
     );
+  }
+
+  if (showAgeSelection) {
+    return renderAgeSelection();
   }
 
   const currentQuestion = questions[currentStep];

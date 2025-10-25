@@ -15,11 +15,12 @@ class PersonalProfilingService {
     }
     /**
      * 연령대별 맞춤형 질문 세트 생성
+     * 심리상담가 1,2가 설계한 연령대별 특화 질문
      */
     getAgeGroupQuestions() {
         return {
             '10s': [
-                // 자아존중감 (10대 특화)
+                // 자아존중감 (10대 특화 - 정체성 형성기)
                 {
                     id: 'teen_self_worth',
                     category: 'selfEsteem',
@@ -48,34 +49,124 @@ class PersonalProfilingService {
                     ageGroup: ['10s'],
                     weight: 1.0
                 },
-                // 스트레스 대처 (10대 특화)
                 {
-                    id: 'teen_stress_coping',
+                    id: 'teen_body_image',
+                    category: 'selfEsteem',
+                    question: '내 외모에 대해 긍정적으로 생각한다',
+                    type: 'scale',
+                    scaleRange: {
+                        min: 1,
+                        max: 5,
+                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+                    },
+                    required: true,
+                    ageGroup: ['10s'],
+                    weight: 1.1
+                },
+                {
+                    id: 'teen_academic_pressure',
                     category: 'stressCoping',
-                    question: '스트레스를 받을 때 주로 어떻게 대처하나요? (복수 선택 가능)',
+                    question: '시험 스트레스를 어떻게 해소하나요?',
                     type: 'multiple-choice',
                     options: [
-                        '친구들과 이야기하기',
-                        '음악 듣기',
-                        '게임하기',
-                        '운동하기',
+                        '친구들과 대화하기',
                         '혼자만의 시간 갖기',
-                        '부모님과 상담하기',
-                        'SNS에 글 올리기',
-                        '공부에 집중하기',
-                        '취미 활동하기',
-                        '전문가 도움 받기'
+                        '운동하기',
+                        '음악 듣기',
+                        '게임하기'
                     ],
                     required: true,
-                    ageGroup: ['10s']
+                    ageGroup: ['10s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'teen_future_worry',
+                    category: 'stressCoping',
+                    question: '미래에 대한 걱정이 많다',
+                    type: 'scale',
+                    scaleRange: {
+                        min: 1,
+                        max: 5,
+                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+                    },
+                    required: true,
+                    ageGroup: ['10s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'teen_relationship_style',
+                    category: 'relationshipPattern',
+                    question: '친구들과의 관계에서 나는',
+                    type: 'multiple-choice',
+                    options: [
+                        '리더 역할을 자주 맡는다',
+                        '조용히 따라가는 편이다',
+                        '중재 역할을 자주 한다',
+                        '혼자 있는 것을 선호한다'
+                    ],
+                    required: true,
+                    ageGroup: ['10s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'teen_core_values',
+                    category: 'coreValues',
+                    question: '나에게 가장 중요한 가치는? (3개까지 선택)',
+                    type: 'multiple-choice',
+                    options: [
+                        '성공',
+                        '친구',
+                        '가족',
+                        '자유',
+                        '공정함',
+                        '창의성',
+                        '안정성',
+                        '모험'
+                    ],
+                    required: true,
+                    ageGroup: ['10s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'teen_strengths',
+                    category: 'strengths',
+                    question: '내가 잘하는 것은? (3개까지 선택)',
+                    type: 'multiple-choice',
+                    options: [
+                        '공부',
+                        '운동',
+                        '예술',
+                        '리더십',
+                        '공감능력',
+                        '창의성',
+                        '논리적 사고',
+                        '협력'
+                    ],
+                    required: true,
+                    ageGroup: ['10s'],
+                    weight: 1.0
                 }
             ],
             '20s': [
-                // 자아존중감 (20대 특화)
+                // 자아존중감 (20대 특화 - 성인기 진입)
                 {
-                    id: 'twenties_self_identity',
+                    id: 'twenties_identity',
                     category: 'selfEsteem',
-                    question: '나는 나만의 정체성을 가지고 있다고 생각한다',
+                    question: '나는 나만의 정체성을 가지고 있다',
+                    type: 'scale',
+                    scaleRange: {
+                        min: 1,
+                        max: 5,
+                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+                    },
+                    required: true,
+                    ageGroup: ['20s'],
+                    weight: 1.2
+                },
+                {
+                    id: 'twenties_career_confidence',
+                    category: 'selfEsteem',
+                    question: '내 직업적 능력에 대해 자신감이 있다',
                     type: 'scale',
                     scaleRange: {
                         min: 1,
@@ -87,9 +178,9 @@ class PersonalProfilingService {
                     weight: 1.1
                 },
                 {
-                    id: 'twenties_career_confidence',
+                    id: 'twenties_independence',
                     category: 'selfEsteem',
-                    question: '나의 미래에 대해 긍정적으로 생각한다',
+                    question: '독립적으로 문제를 해결할 수 있다',
                     type: 'scale',
                     scaleRange: {
                         min: 1,
@@ -100,34 +191,110 @@ class PersonalProfilingService {
                     ageGroup: ['20s'],
                     weight: 1.0
                 },
-                // 스트레스 대처 (20대 특화)
                 {
-                    id: 'twenties_stress_coping',
+                    id: 'twenties_work_stress',
                     category: 'stressCoping',
-                    question: '스트레스를 받을 때 주로 어떻게 대처하나요? (복수 선택 가능)',
+                    question: '직장/학교 스트레스를 어떻게 해소하나요?',
                     type: 'multiple-choice',
                     options: [
-                        '친구들과 만나서 이야기하기',
-                        '운동이나 스포츠하기',
-                        '취미 활동하기',
+                        '동료/친구들과 대화하기',
                         '혼자만의 시간 갖기',
-                        '여행하기',
-                        '음식으로 스트레스 해소하기',
-                        '영화나 드라마 보기',
-                        '독서하기',
-                        '명상이나 요가하기',
-                        '전문가 상담받기'
+                        '운동이나 취미활동',
+                        '음주나 쇼핑',
+                        '여행하기'
                     ],
                     required: true,
-                    ageGroup: ['20s']
+                    ageGroup: ['20s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'twenties_future_planning',
+                    category: 'stressCoping',
+                    question: '미래 계획에 대한 불안감이 있다',
+                    type: 'scale',
+                    scaleRange: {
+                        min: 1,
+                        max: 5,
+                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+                    },
+                    required: true,
+                    ageGroup: ['20s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'twenties_romantic_relationship',
+                    category: 'relationshipPattern',
+                    question: '연인과의 관계에서 나는',
+                    type: 'multiple-choice',
+                    options: [
+                        '적극적으로 표현한다',
+                        '조용히 관찰한다',
+                        '균형을 맞추려고 노력한다',
+                        '독립성을 유지한다'
+                    ],
+                    required: true,
+                    ageGroup: ['20s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'twenties_core_values',
+                    category: 'coreValues',
+                    question: '나에게 가장 중요한 가치는? (3개까지 선택)',
+                    type: 'multiple-choice',
+                    options: [
+                        '성공',
+                        '사랑',
+                        '자유',
+                        '안정성',
+                        '성장',
+                        '창의성',
+                        '공정함',
+                        '모험'
+                    ],
+                    required: true,
+                    ageGroup: ['20s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'twenties_strengths',
+                    category: 'strengths',
+                    question: '내가 잘하는 것은? (3개까지 선택)',
+                    type: 'multiple-choice',
+                    options: [
+                        '업무능력',
+                        '소통능력',
+                        '리더십',
+                        '창의성',
+                        '문제해결',
+                        '협력',
+                        '적응력',
+                        '전문성'
+                    ],
+                    required: true,
+                    ageGroup: ['20s'],
+                    weight: 1.0
                 }
             ],
             '30s': [
-                // 자아존중감 (30대 특화)
+                // 자아존중감 (30대 특화 - 안정기)
                 {
                     id: 'thirties_life_satisfaction',
                     category: 'selfEsteem',
-                    question: '현재 내 삶에 만족하고 있다',
+                    question: '현재 내 삶에 만족한다',
+                    type: 'scale',
+                    scaleRange: {
+                        min: 1,
+                        max: 5,
+                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+                    },
+                    required: true,
+                    ageGroup: ['30s'],
+                    weight: 1.2
+                },
+                {
+                    id: 'thirties_professional_confidence',
+                    category: 'selfEsteem',
+                    question: '내 전문성에 대해 자신감이 있다',
                     type: 'scale',
                     scaleRange: {
                         min: 1,
@@ -139,8 +306,8 @@ class PersonalProfilingService {
                     weight: 1.1
                 },
                 {
-                    id: 'thirties_balance',
-                    category: 'selfEsteem',
+                    id: 'thirties_work_life_balance',
+                    category: 'stressCoping',
                     question: '일과 삶의 균형을 잘 맞추고 있다',
                     type: 'scale',
                     scaleRange: {
@@ -151,14 +318,125 @@ class PersonalProfilingService {
                     required: true,
                     ageGroup: ['30s'],
                     weight: 1.0
+                },
+                {
+                    id: 'thirties_family_stress',
+                    category: 'stressCoping',
+                    question: '가족 관련 스트레스를 어떻게 해소하나요?',
+                    type: 'multiple-choice',
+                    options: [
+                        '배우자와 대화하기',
+                        '혼자만의 시간 갖기',
+                        '운동이나 취미활동',
+                        '친구들과 만나기',
+                        '전문가 상담받기'
+                    ],
+                    required: true,
+                    ageGroup: ['30s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'thirties_parenting_concerns',
+                    category: 'stressCoping',
+                    question: '육아나 가족 관리에 대한 부담감이 있다',
+                    type: 'scale',
+                    scaleRange: {
+                        min: 1,
+                        max: 5,
+                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+                    },
+                    required: true,
+                    ageGroup: ['30s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'thirties_relationship_maturity',
+                    category: 'relationshipPattern',
+                    question: '인간관계에서 나는',
+                    type: 'multiple-choice',
+                    options: [
+                        '성숙하게 소통한다',
+                        '갈등을 피하려고 한다',
+                        '솔직하게 표현한다',
+                        '상대방을 배려한다'
+                    ],
+                    required: true,
+                    ageGroup: ['30s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'thirties_core_values',
+                    category: 'coreValues',
+                    question: '나에게 가장 중요한 가치는? (3개까지 선택)',
+                    type: 'multiple-choice',
+                    options: [
+                        '가족',
+                        '안정성',
+                        '성공',
+                        '건강',
+                        '성장',
+                        '평화',
+                        '공정함',
+                        '사랑'
+                    ],
+                    required: true,
+                    ageGroup: ['30s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'thirties_strengths',
+                    category: 'strengths',
+                    question: '내가 잘하는 것은? (3개까지 선택)',
+                    type: 'multiple-choice',
+                    options: [
+                        '가족관리',
+                        '업무능력',
+                        '소통능력',
+                        '문제해결',
+                        '리더십',
+                        '조직력',
+                        '인내심',
+                        '전문성'
+                    ],
+                    required: true,
+                    ageGroup: ['30s'],
+                    weight: 1.0
                 }
             ],
             '40s': [
-                // 자아존중감 (40대 특화)
+                // 자아존중감 (40대 특화 - 중년기)
                 {
-                    id: 'forties_wisdom',
+                    id: 'forties_midlife_satisfaction',
                     category: 'selfEsteem',
-                    question: '나이만큼의 지혜와 경험을 가지고 있다고 생각한다',
+                    question: '중년의 나이에 만족한다',
+                    type: 'scale',
+                    scaleRange: {
+                        min: 1,
+                        max: 5,
+                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+                    },
+                    required: true,
+                    ageGroup: ['40s'],
+                    weight: 1.2
+                },
+                {
+                    id: 'forties_wisdom_confidence',
+                    category: 'selfEsteem',
+                    question: '내 인생 경험과 지혜에 대해 자신감이 있다',
+                    type: 'scale',
+                    scaleRange: {
+                        min: 1,
+                        max: 5,
+                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+                    },
+                    required: true,
+                    ageGroup: ['40s'],
+                    weight: 1.1
+                },
+                {
+                    id: 'forties_aging_concerns',
+                    category: 'stressCoping',
+                    question: '나이듦에 대한 걱정이 있다',
                     type: 'scale',
                     scaleRange: {
                         min: 1,
@@ -170,9 +448,25 @@ class PersonalProfilingService {
                     weight: 1.0
                 },
                 {
-                    id: 'forties_leadership',
-                    category: 'selfEsteem',
-                    question: '다른 사람들에게 좋은 조언을 줄 수 있다',
+                    id: 'forties_career_stress',
+                    category: 'stressCoping',
+                    question: '직장에서의 스트레스를 어떻게 해소하나요?',
+                    type: 'multiple-choice',
+                    options: [
+                        '동료들과 대화하기',
+                        '가족과 시간 보내기',
+                        '운동이나 취미활동',
+                        '독서나 명상',
+                        '여행하기'
+                    ],
+                    required: true,
+                    ageGroup: ['40s'],
+                    weight: 1.0
+                },
+                {
+                    id: 'forties_teenage_children',
+                    category: 'stressCoping',
+                    question: '청소년 자녀와의 관계에서 스트레스를 받는다',
                     type: 'scale',
                     scaleRange: {
                         min: 1,
@@ -182,59 +476,67 @@ class PersonalProfilingService {
                     required: true,
                     ageGroup: ['40s'],
                     weight: 1.0
-                }
-            ],
-            '50s': [
-                // 자아존중감 (50대 특화)
+                },
                 {
-                    id: 'fifties_acceptance',
-                    category: 'selfEsteem',
-                    question: '나이에 따른 변화를 자연스럽게 받아들인다',
-                    type: 'scale',
-                    scaleRange: {
-                        min: 1,
-                        max: 5,
-                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
-                    },
+                    id: 'forties_relationship_depth',
+                    category: 'relationshipPattern',
+                    question: '인간관계에서 나는',
+                    type: 'multiple-choice',
+                    options: [
+                        '깊이 있는 관계를 선호한다',
+                        '표면적 관계를 유지한다',
+                        '선별적으로 관계를 맺는다',
+                        '모든 사람과 좋은 관계를 유지한다'
+                    ],
                     required: true,
-                    ageGroup: ['50s'],
+                    ageGroup: ['40s'],
                     weight: 1.0
                 },
                 {
-                    id: 'fifties_legacy',
-                    category: 'selfEsteem',
-                    question: '내가 남긴 것들에 대해 만족한다',
-                    type: 'scale',
-                    scaleRange: {
-                        min: 1,
-                        max: 5,
-                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
-                    },
+                    id: 'forties_core_values',
+                    category: 'coreValues',
+                    question: '나에게 가장 중요한 가치는? (3개까지 선택)',
+                    type: 'multiple-choice',
+                    options: [
+                        '가족',
+                        '건강',
+                        '안정성',
+                        '지혜',
+                        '평화',
+                        '성장',
+                        '공정함',
+                        '사랑'
+                    ],
                     required: true,
-                    ageGroup: ['50s'],
-                    weight: 1.0
-                }
-            ],
-            '60s+': [
-                // 자아존중감 (60대+ 특화)
-                {
-                    id: 'sixties_wisdom',
-                    category: 'selfEsteem',
-                    question: '인생의 지혜를 가지고 있다고 생각한다',
-                    type: 'scale',
-                    scaleRange: {
-                        min: 1,
-                        max: 5,
-                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
-                    },
-                    required: true,
-                    ageGroup: ['60s+'],
+                    ageGroup: ['40s'],
                     weight: 1.0
                 },
                 {
-                    id: 'sixties_gratitude',
+                    id: 'forties_strengths',
+                    category: 'strengths',
+                    question: '내가 잘하는 것은? (3개까지 선택)',
+                    type: 'multiple-choice',
+                    options: [
+                        '가족관리',
+                        '업무능력',
+                        '조언하기',
+                        '문제해결',
+                        '리더십',
+                        '조직력',
+                        '인내심',
+                        '지혜'
+                    ],
+                    required: true,
+                    ageGroup: ['40s'],
+                    weight: 1.0
+                }
+            ],
+            '50s+': [
+                // 자아존중감 (50대+ 특화 - 성숙기)
+                {
+                    id: 'fifties_life_acceptance',
                     category: 'selfEsteem',
-                    question: '삶에 대해 감사하는 마음을 가지고 있다',
+                    question: '내 인생을 긍정적으로 받아들인다',
                     type: 'scale',
                     scaleRange: {
                         min: 1,
@@ -242,108 +544,149 @@ class PersonalProfilingService {
                         labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
                     },
                     required: true,
-                    ageGroup: ['60s+'],
+                    ageGroup: ['50s+'],
+                    weight: 1.2
+                },
+                {
+                    id: 'fifties_legacy_concern',
+                    category: 'selfEsteem',
+                    question: '내가 남긴 것에 대해 만족한다',
+                    type: 'scale',
+                    scaleRange: {
+                        min: 1,
+                        max: 5,
+                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+                    },
+                    required: true,
+                    ageGroup: ['50s+'],
+                    weight: 1.1
+                },
+                {
+                    id: 'fifties_health_concerns',
+                    category: 'stressCoping',
+                    question: '건강에 대한 걱정이 있다',
+                    type: 'scale',
+                    scaleRange: {
+                        min: 1,
+                        max: 5,
+                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+                    },
+                    required: true,
+                    ageGroup: ['50s+'],
+                    weight: 1.0
+                },
+                {
+                    id: 'fifties_retirement_stress',
+                    category: 'stressCoping',
+                    question: '은퇴나 노후에 대한 걱정이 있다',
+                    type: 'scale',
+                    scaleRange: {
+                        min: 1,
+                        max: 5,
+                        labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다']
+                    },
+                    required: true,
+                    ageGroup: ['50s+'],
+                    weight: 1.0
+                },
+                {
+                    id: 'fifties_stress_coping',
+                    category: 'stressCoping',
+                    question: '스트레스를 어떻게 해소하나요?',
+                    type: 'multiple-choice',
+                    options: [
+                        '가족과 대화하기',
+                        '혼자만의 시간 갖기',
+                        '운동이나 취미활동',
+                        '독서나 명상',
+                        '여행하기'
+                    ],
+                    required: true,
+                    ageGroup: ['50s+'],
+                    weight: 1.0
+                },
+                {
+                    id: 'fifties_relationship_wisdom',
+                    category: 'relationshipPattern',
+                    question: '인간관계에서 나는',
+                    type: 'multiple-choice',
+                    options: [
+                        '지혜롭게 조언한다',
+                        '조용히 관찰한다',
+                        '균형을 맞추려고 노력한다',
+                        '깊이 있는 관계를 선호한다'
+                    ],
+                    required: true,
+                    ageGroup: ['50s+'],
+                    weight: 1.0
+                },
+                {
+                    id: 'fifties_core_values',
+                    category: 'coreValues',
+                    question: '나에게 가장 중요한 가치는? (3개까지 선택)',
+                    type: 'multiple-choice',
+                    options: [
+                        '가족',
+                        '건강',
+                        '평화',
+                        '지혜',
+                        '사랑',
+                        '안정성',
+                        '공정함',
+                        '성장'
+                    ],
+                    required: true,
+                    ageGroup: ['50s+'],
+                    weight: 1.0
+                },
+                {
+                    id: 'fifties_strengths',
+                    category: 'strengths',
+                    question: '내가 잘하는 것은? (3개까지 선택)',
+                    type: 'multiple-choice',
+                    options: [
+                        '가족관리',
+                        '조언하기',
+                        '문제해결',
+                        '리더십',
+                        '조직력',
+                        '인내심',
+                        '지혜',
+                        '공감능력'
+                    ],
+                    required: true,
+                    ageGroup: ['50s+'],
                     weight: 1.0
                 }
             ]
         };
     }
     /**
-     * 연령대별 맞춤형 질문 세트 반환
+     * 연령대별 맞춤형 질문 조회
      */
     async getPersonalizedQuestions(ageGroup) {
-        const ageGroupQuestions = this.getAgeGroupQuestions();
-        const baseQuestions = ageGroupQuestions[ageGroup] || ageGroupQuestions['20s'];
-        // 공통 질문 추가
-        const commonQuestions = [
-            // 대인관계 패턴 (공통)
-            {
-                id: 'relationship_style',
-                category: 'relationshipPattern',
-                question: '당신의 대인관계 스타일은 어떤 편인가요?',
-                type: 'multiple-choice',
-                options: [
-                    '외향적이고 사교적인 편',
-                    '내향적이고 신중한 편',
-                    '상황에 따라 유연하게 적응',
-                    '깊고 의미 있는 관계를 선호',
-                    '넓고 다양한 관계를 선호',
-                    '리더십을 발휘하는 편',
-                    '협력하고 지원하는 편',
-                    '독립적이고 자율적인 편'
-                ],
-                required: true
-            },
-            // 핵심 가치관 (공통)
-            {
-                id: 'core_values',
-                category: 'coreValues',
-                question: '당신에게 가장 중요한 가치관은 무엇인가요? (최대 5개 선택)',
-                type: 'multiple-choice',
-                options: [
-                    '가족과의 유대',
-                    '개인의 성장',
-                    '사회적 기여',
-                    '경제적 안정',
-                    '창의성과 혁신',
-                    '정직과 진실',
-                    '자유와 독립',
-                    '안정과 보안',
-                    '모험과 도전',
-                    '조화와 평화',
-                    '성취와 성공',
-                    '사랑과 관계',
-                    '지식과 학습',
-                    '건강과 웰빙',
-                    '영성과 의미'
-                ],
-                required: true
-            },
-            // 강점 발견 (공통)
-            {
-                id: 'personal_strengths',
-                category: 'strengths',
-                question: '다음 중 당신의 강점이라고 생각하는 것들을 선택해주세요 (최대 7개)',
-                type: 'multiple-choice',
-                options: [
-                    '공감 능력',
-                    '논리적 사고',
-                    '창의적 아이디어',
-                    '리더십',
-                    '협력과 팀워크',
-                    '끈기와 인내',
-                    '유연성과 적응력',
-                    '의사소통 능력',
-                    '문제 해결 능력',
-                    '계획과 조직력',
-                    '호기심과 학습욕',
-                    '긍정적 사고',
-                    '책임감',
-                    '도전 정신',
-                    '배려와 친절',
-                    '집중력',
-                    '직관력',
-                    '분석 능력',
-                    '예술적 감각',
-                    '유머 감각'
-                ],
-                required: true
-            }
-        ];
-        return [...baseQuestions, ...commonQuestions];
+        try {
+            const ageGroupQuestions = this.getAgeGroupQuestions();
+            const questions = ageGroupQuestions[ageGroup] || ageGroupQuestions['20s']; // 기본값: 20대
+            return questions;
+        }
+        catch (error) {
+            console.error('연령대별 질문 조회 오류:', error);
+            throw new Error('질문 조회에 실패했습니다.');
+        }
     }
     /**
      * 프로파일링 응답 분석 및 결과 생성
      */
     async analyzeProfilingResponses(userId, ageGroup, responses) {
         try {
-            // 1. 기본 점수 계산
+            // 점수 계산
             const scores = this.calculateScores(responses, ageGroup);
-            // 2. 마음 지도 생성
-            const mindMap = this.generateMindMap(scores, responses);
-            // 3. AI 기반 심층 분석
-            const aiAnalysis = await this.performAIAnalysis(scores, responses, ageGroup);
-            // 4. 결과 구성
+            // 마음 지도 생성
+            const mindMap = this.generateMindMap(scores);
+            // AI 분석 생성
+            const aiAnalysis = await this.generateAIAnalysis(responses, ageGroup);
+            // 결과 저장
             const result = {
                 userId,
                 ageGroup,
@@ -357,87 +700,122 @@ class PersonalProfilingService {
                     analysisDepth: 'advanced'
                 })
             };
-            // 5. 결과 저장
             await this.saveProfilingResult(result);
             return result;
         }
         catch (error) {
             console.error('프로파일링 분석 오류:', error);
-            throw error;
+            throw new Error('프로파일링 분석에 실패했습니다.');
+        }
+    }
+    /**
+     * 프로파일링 결과 조회
+     */
+    async getProfilingResult(userId) {
+        var _a;
+        try {
+            const doc = await this.database.collection('personal_profiles').doc(userId).get();
+            if (!doc.exists) {
+                return null;
+            }
+            const data = doc.data();
+            return {
+                userId: (data === null || data === void 0 ? void 0 : data.userId) || userId,
+                ageGroup: (data === null || data === void 0 ? void 0 : data.ageGroup) || '20s',
+                completedAt: ((_a = data === null || data === void 0 ? void 0 : data.completedAt) === null || _a === void 0 ? void 0 : _a.toDate()) || new Date(),
+                responses: (data === null || data === void 0 ? void 0 : data.responses) || {},
+                scores: (data === null || data === void 0 ? void 0 : data.scores) || {},
+                mindMap: (data === null || data === void 0 ? void 0 : data.mindMap) || {},
+                aiAnalysis: (data === null || data === void 0 ? void 0 : data.aiAnalysis) || {},
+                aiWarning: (data === null || data === void 0 ? void 0 : data.aiWarning) || null
+            };
+        }
+        catch (error) {
+            console.error('프로파일링 결과 조회 오류:', error);
+            throw new Error('프로파일링 결과 조회에 실패했습니다.');
         }
     }
     /**
      * 점수 계산
      */
     calculateScores(responses, ageGroup) {
-        // 자아존중감 점수 계산
-        const selfEsteemQuestions = Object.keys(responses).filter(key => key.includes('self') || key.includes('worth') || key.includes('confidence'));
+        const questions = this.getAgeGroupQuestions()[ageGroup] || [];
         let selfEsteemTotal = 0;
         let selfEsteemCount = 0;
-        selfEsteemQuestions.forEach(questionId => {
-            const response = responses[questionId];
-            if (typeof response === 'number') {
-                selfEsteemTotal += response;
-                selfEsteemCount++;
+        const stressCoping = {
+            active: 0,
+            passive: 0,
+            social: 0,
+            individual: 0
+        };
+        let relationshipPattern = '';
+        const coreValues = [];
+        const strengths = [];
+        questions.forEach(question => {
+            const response = responses[question.id];
+            if (!response)
+                return;
+            switch (question.category) {
+                case 'selfEsteem':
+                    if (typeof response === 'number') {
+                        selfEsteemTotal += response * (question.weight || 1);
+                        selfEsteemCount++;
+                    }
+                    break;
+                case 'stressCoping':
+                    if (Array.isArray(response)) {
+                        response.forEach(option => {
+                            if (option.includes('대화') || option.includes('만나기')) {
+                                stressCoping.social++;
+                            }
+                            else if (option.includes('운동') || option.includes('활동')) {
+                                stressCoping.active++;
+                            }
+                            else if (option.includes('혼자') || option.includes('독서')) {
+                                stressCoping.individual++;
+                            }
+                            else {
+                                stressCoping.passive++;
+                            }
+                        });
+                    }
+                    break;
+                case 'relationshipPattern':
+                    relationshipPattern = response;
+                    break;
+                case 'coreValues':
+                    if (Array.isArray(response)) {
+                        coreValues.push(...response);
+                    }
+                    break;
+                case 'strengths':
+                    if (Array.isArray(response)) {
+                        strengths.push(...response);
+                    }
+                    break;
             }
         });
-        const selfEsteem = selfEsteemCount > 0 ? Math.round((selfEsteemTotal / selfEsteemCount) * 20) : 50;
-        // 스트레스 대처 방식 분석
-        const stressCoping = responses.stress_coping || responses.teen_stress_coping || responses.twenties_stress_coping || [];
-        const stressCopingAnalysis = {
-            active: this.categorizeStressCoping(stressCoping, 'active'),
-            passive: this.categorizeStressCoping(stressCoping, 'passive'),
-            social: this.categorizeStressCoping(stressCoping, 'social'),
-            individual: this.categorizeStressCoping(stressCoping, 'individual')
-        };
         return {
-            selfEsteem,
-            stressCoping: stressCopingAnalysis,
-            relationshipPattern: responses.relationship_style || '',
-            coreValues: responses.core_values || [],
-            strengths: responses.personal_strengths || []
+            selfEsteem: selfEsteemCount > 0 ? Math.round((selfEsteemTotal / selfEsteemCount) * 20) : 50,
+            stressCoping,
+            relationshipPattern,
+            coreValues: [...new Set(coreValues)],
+            strengths: [...new Set(strengths)]
         };
-    }
-    /**
-     * 스트레스 대처 방식 분류
-     */
-    categorizeStressCoping(methods, category) {
-        const activeMethods = ['운동이나 신체 활동', '문제 해결에 집중하기', '운동이나 스포츠하기', '운동하기'];
-        const passiveMethods = ['일시적으로 피하기', '음악 듣기', '영화나 드라마 보기', '게임하기'];
-        const socialMethods = ['친구나 가족과 대화', '친구들과 이야기하기', '친구들과 만나서 이야기하기', '부모님과 상담하기'];
-        const individualMethods = ['혼자만의 시간 갖기', '명상이나 요가', '독서하기', '취미 활동하기'];
-        let categoryMethods = [];
-        switch (category) {
-            case 'active':
-                categoryMethods = activeMethods;
-                break;
-            case 'passive':
-                categoryMethods = passiveMethods;
-                break;
-            case 'social':
-                categoryMethods = socialMethods;
-                break;
-            case 'individual':
-                categoryMethods = individualMethods;
-                break;
-        }
-        const matches = methods.filter(method => categoryMethods.some(categoryMethod => method.includes(categoryMethod))).length;
-        return Math.round((matches / methods.length) * 100) || 0;
     }
     /**
      * 마음 지도 생성
      */
-    generateMindMap(scores, responses) {
+    generateMindMap(scores) {
         // 성격 유형 결정
         let personality = '';
-        const relationshipPattern = responses.relationship_style || '';
-        if (relationshipPattern.includes('외향적')) {
+        if (scores.relationshipPattern.includes('리더')) {
             personality = '외향형 리더';
         }
-        else if (relationshipPattern.includes('내향적')) {
+        else if (scores.relationshipPattern.includes('조용히')) {
             personality = '내향형 사색가';
         }
-        else if (relationshipPattern.includes('유연하게')) {
+        else if (scores.relationshipPattern.includes('중재')) {
             personality = '적응형 중재자';
         }
         else {
@@ -445,14 +823,13 @@ class PersonalProfilingService {
         }
         // 감정 패턴 분석
         let emotionalPattern = '';
-        const stressCoping = responses.stress_coping || responses.teen_stress_coping || responses.twenties_stress_coping || [];
-        if (stressCoping.some((method) => method.includes('친구') || method.includes('가족'))) {
+        if (scores.stressCoping.social > scores.stressCoping.individual) {
             emotionalPattern = '관계 중심형';
         }
-        else if (stressCoping.some((method) => method.includes('혼자'))) {
+        else if (scores.stressCoping.individual > scores.stressCoping.social) {
             emotionalPattern = '내적 성찰형';
         }
-        else if (stressCoping.some((method) => method.includes('문제 해결'))) {
+        else if (scores.stressCoping.active > scores.stressCoping.passive) {
             emotionalPattern = '해결 지향형';
         }
         else {
@@ -460,101 +837,106 @@ class PersonalProfilingService {
         }
         // 소통 스타일 결정
         let communicationStyle = '';
-        const strengths = responses.personal_strengths || [];
-        if (strengths.includes('의사소통 능력')) {
+        if (scores.strengths.includes('소통능력')) {
             communicationStyle = '적극적 소통형';
         }
-        else if (strengths.includes('공감 능력')) {
+        else if (scores.strengths.includes('공감능력')) {
             communicationStyle = '공감적 경청형';
         }
-        else if (strengths.includes('논리적 사고')) {
+        else if (scores.strengths.includes('논리적 사고')) {
             communicationStyle = '논리적 설득형';
         }
         else {
             communicationStyle = '조화로운 대화형';
         }
-        // 성장 영역 식별
-        const growthAreas = [];
-        if (scores.selfEsteem < 60)
-            growthAreas.push('자아존중감 향상');
-        if (scores.stressCoping.passive > 70)
-            growthAreas.push('적극적 대처법 학습');
-        if (scores.stressCoping.social < 30)
-            growthAreas.push('사회적 지지망 구축');
-        if (strengths.length < 5)
-            growthAreas.push('강점 발견 및 활용');
-        // 맞춤형 추천 생성
-        const recommendations = [];
-        if (scores.selfEsteem < 60) {
-            recommendations.push('매일 자신의 장점 3가지를 적어보는 습관 만들기');
-        }
-        if (scores.stressCoping.passive > 70) {
-            recommendations.push('운동이나 명상 등 적극적 스트레스 해소법 시도하기');
-        }
-        if (scores.stressCoping.social < 30) {
-            recommendations.push('신뢰할 수 있는 사람들과 정기적으로 만나기');
-        }
         return {
             personality,
             emotionalPattern,
             communicationStyle,
-            growthAreas,
-            recommendations
+            growthAreas: this.getGrowthAreas(scores),
+            recommendations: this.getRecommendations(scores)
         };
     }
     /**
-     * AI 기반 심층 분석
+     * 성장 영역 식별
      */
-    async performAIAnalysis(scores, responses, ageGroup) {
+    getGrowthAreas(scores) {
+        const areas = [];
+        if (scores.selfEsteem < 60) {
+            areas.push('자아존중감 향상');
+        }
+        if (scores.stressCoping.passive > scores.stressCoping.active) {
+            areas.push('적극적 스트레스 관리');
+        }
+        if (scores.coreValues.length < 3) {
+            areas.push('가치관 정립');
+        }
+        return areas;
+    }
+    /**
+     * 추천사항 생성
+     */
+    getRecommendations(scores) {
+        const recommendations = [];
+        if (scores.selfEsteem < 60) {
+            recommendations.push('매일 자신을 칭찬하는 습관을 만들어보세요');
+        }
+        if (scores.stressCoping.social > scores.stressCoping.individual) {
+            recommendations.push('혼자만의 시간을 갖는 것도 중요합니다');
+        }
+        if (scores.strengths.length < 3) {
+            recommendations.push('새로운 취미나 활동을 시도해보세요');
+        }
+        return recommendations;
+    }
+    /**
+     * AI 분석 생성
+     */
+    async generateAIAnalysis(responses, ageGroup) {
+        var _a, _b;
         try {
-            const analysisPrompt = `
-당신은 30년 경력의 전문 심리상담가입니다. 다음 프로파일링 결과를 분석해주세요:
-
-연령대: ${ageGroup}
-점수 결과: ${JSON.stringify(scores)}
-응답 데이터: ${JSON.stringify(responses)}
-
-다음 항목들을 분석해주세요:
-
-1. summary: 전체적인 심리 상태 요약 (2-3문장)
-2. insights: 주요 인사이트 3-4개 (구체적이고 실용적)
-3. personalizedAdvice: 개인 맞춤형 조언 3-4개 (실천 가능한)
-4. monthlyGoals: 다음 달 목표 3개 (구체적이고 달성 가능한)
-
-⚠️ 중요 원칙:
-- 긍정적이고 성장 지향적인 관점 유지
-- 개인의 연령대와 상황 고려
-- 실천 가능한 구체적 조언 제공
-- AI 분석의 한계 인정
-
-JSON 형태로 응답해주세요.
-`;
+            const prompt = `
+        연령대: ${ageGroup}
+        응답 데이터: ${JSON.stringify(responses)}
+        
+        이 데이터를 바탕으로 개인화된 심리 분석을 제공해주세요:
+        1. 종합 요약 (2-3문장)
+        2. 주요 인사이트 (3-5개)
+        3. 개인화된 조언 (3-5개)
+        4. 월간 목표 (3-5개)
+        
+        한국어로 답변해주세요.
+      `;
             const completion = await ai_1.openai.chat.completions.create({
                 model: ai_1.AI_MODELS.ANALYSIS,
-                messages: [{ role: "user", content: analysisPrompt }],
-                temperature: 0.7,
+                messages: [
+                    {
+                        role: 'system',
+                        content: '당신은 전문 심리상담사입니다. 사용자의 응답을 바탕으로 따뜻하고 건설적인 분석을 제공해주세요.'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                max_tokens: 1000,
+                temperature: 0.7
             });
-            return JSON.parse(completion.choices[0].message.content || '{}');
+            const analysis = ((_b = (_a = completion.choices[0]) === null || _a === void 0 ? void 0 : _a.message) === null || _b === void 0 ? void 0 : _b.content) || '';
+            return {
+                summary: analysis.split('\n')[0] || '분석 결과를 생성했습니다.',
+                insights: analysis.split('\n').slice(1, 6).filter(line => line.trim()),
+                personalizedAdvice: analysis.split('\n').slice(6, 11).filter(line => line.trim()),
+                monthlyGoals: analysis.split('\n').slice(11, 16).filter(line => line.trim())
+            };
         }
         catch (error) {
-            console.error('AI 분석 오류:', error);
+            console.error('AI 분석 생성 오류:', error);
             return {
-                summary: "프로파일링이 완료되었습니다. 개인의 고유한 특성을 파악했습니다.",
-                insights: [
-                    "자아존중감 수준을 확인했습니다.",
-                    "스트레스 대처 방식을 분석했습니다.",
-                    "대인관계 패턴을 파악했습니다."
-                ],
-                personalizedAdvice: [
-                    "매일 자신을 긍정적으로 대하는 습관을 만들어보세요.",
-                    "스트레스 상황에서 건강한 대처법을 연습해보세요.",
-                    "주변 사람들과의 관계를 소중히 여기세요."
-                ],
-                monthlyGoals: [
-                    "감정 일기를 꾸준히 작성하기",
-                    "새로운 취미 활동 시작하기",
-                    "가족이나 친구와의 시간 늘리기"
-                ]
+                summary: 'AI 분석을 생성하는 중 오류가 발생했습니다.',
+                insights: ['분석 결과를 확인해주세요'],
+                personalizedAdvice: ['전문가 상담을 권장합니다'],
+                monthlyGoals: ['꾸준한 자기 관리를 권장합니다']
             };
         }
     }
@@ -562,36 +944,12 @@ JSON 형태로 응답해주세요.
      * 프로파일링 결과 저장
      */
     async saveProfilingResult(result) {
-        await this.database.collection('profiling_results').doc(result.userId).set(Object.assign(Object.assign({}, result), { createdAt: (0, firebaseAdmin_1.serverTimestamp)(), updatedAt: (0, firebaseAdmin_1.serverTimestamp)() }));
-    }
-    /**
-     * 사용자 프로파일링 결과 조회
-     */
-    async getProfilingResult(userId) {
-        var _a;
         try {
-            const doc = await this.database.collection('profiling_results').doc(userId).get();
-            if (!doc.exists) {
-                return null;
-            }
-            const data = doc.data();
-            return Object.assign(Object.assign({}, data), { completedAt: ((_a = data === null || data === void 0 ? void 0 : data.completedAt) === null || _a === void 0 ? void 0 : _a.toDate()) || new Date() });
+            await this.database.collection('personal_profiles').doc(result.userId).set(Object.assign(Object.assign({}, result), { createdAt: (0, firebaseAdmin_1.serverTimestamp)(), updatedAt: (0, firebaseAdmin_1.serverTimestamp)() }));
         }
         catch (error) {
-            console.error('프로파일링 결과 조회 오류:', error);
-            throw error;
-        }
-    }
-    /**
-     * 프로파일링 결과 업데이트
-     */
-    async updateProfilingResult(userId, updates) {
-        try {
-            await this.database.collection('profiling_results').doc(userId).update(Object.assign(Object.assign({}, updates), { updatedAt: (0, firebaseAdmin_1.serverTimestamp)() }));
-        }
-        catch (error) {
-            console.error('프로파일링 결과 업데이트 오류:', error);
-            throw error;
+            console.error('프로파일링 결과 저장 오류:', error);
+            throw new Error('프로파일링 결과 저장에 실패했습니다.');
         }
     }
 }
