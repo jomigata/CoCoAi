@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { SkipToContent, Volume2, VolumeX, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, SkipForward } from 'lucide-react';
 
 interface AccessibilityProviderProps {
   children: React.ReactNode;
 }
 
 interface AccessibilityState {
-  skipToContent: boolean;
   screenReaderMode: boolean;
   highContrast: boolean;
   fontSize: 'small' | 'medium' | 'large';
@@ -15,7 +14,6 @@ interface AccessibilityState {
 
 export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ children }) => {
   const [accessibilityState, setAccessibilityState] = useState<AccessibilityState>({
-    skipToContent: false,
     screenReaderMode: false,
     highContrast: false,
     fontSize: 'medium',
