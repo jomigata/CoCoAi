@@ -419,8 +419,7 @@ const ValueAnalysisPage: React.FC = () => {
                 {analysis.personalValues.map(value => (
                   <div
                     key={value.id}
-                    className="bg-white rounded-xl shadow-soft p-6 cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => setSelectedValue(value)}
+                    className="bg-white rounded-xl shadow-soft p-6 hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <div className={`p-3 rounded-lg ${value.color === 'red' ? 'bg-red-100 text-red-600' :
