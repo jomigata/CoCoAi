@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
 import { doc, getDoc, collection, getDocs, addDoc } from 'firebase/firestore';
 import { db } from '@config/firebase';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import toast from 'react-hot-toast';
 import { 
   Users, 
@@ -110,94 +111,63 @@ const GroupDiagnosisPage: React.FC = () => {
   };
 
   const loadDiagnosisQuestions = async () => {
-    // 실제 구현에서는 그룹 유형에 따라 다른 질문 세트 로드
-    // 임시로 하드코딩된 질문들 사용
-    const mockQuestions: DiagnosisQuestion[] = [
-      // 소통 관련 질문
-      {
-        id: 'comm_1',
-        category: 'communication',
-        question: '우리 그룹에서 서로의 의견을 자유롭게 표현할 수 있다',
-        type: 'scale',
-        scaleRange: { 
-          min: 1, 
-          max: 5, 
-          labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다'] 
-        },
-        required: true
-      },
-      {
-        id: 'comm_2',
-        category: 'communication',
-        question: '그룹 내에서 가장 중요한 소통 방식은 무엇인가요?',
-        type: 'choice',
-        options: ['직접적인 대화', '경청과 공감', '비언어적 표현', '서면 소통', '행동으로 보여주기'],
-        required: true
-      },
-      
-      // 신뢰 관련 질문
-      {
-        id: 'trust_1',
-        category: 'trust',
-        question: '그룹 멤버들을 완전히 신뢰한다',
-        type: 'scale',
-        scaleRange: { 
-          min: 1, 
-          max: 5, 
-          labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다'] 
-        },
-        required: true
-      },
-      {
-        id: 'trust_2',
-        category: 'trust',
-        question: '신뢰 구축에 가장 중요한 요소를 순서대로 나열해주세요',
-        type: 'ranking',
-        options: ['약속 지키기', '솔직한 소통', '상호 존중', '시간 투자', '공통 목표'],
-        required: true
-      },
-      
-      // 갈등 해결 관련 질문
-      {
-        id: 'conflict_1',
-        category: 'conflict',
-        question: '그룹 내 갈등이 발생했을 때 주로 어떻게 해결하나요?',
-        type: 'choice',
-        options: ['직접 대화로 해결', '시간을 두고 자연스럽게', '제3자 중재', '각자 양보', '리더가 결정'],
-        required: true
-      },
-      
-      // 지지 관련 질문
-      {
-        id: 'support_1',
-        category: 'support',
-        question: '어려운 일이 있을 때 그룹 멤버들에게 도움을 요청할 수 있다',
-        type: 'scale',
-        scaleRange: { 
-          min: 1, 
-          max: 5, 
-          labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다'] 
-        },
-        required: true
-      },
-      
-      // 목표 관련 질문
-      {
-        id: 'goals_1',
-        category: 'goals',
-        question: '우리 그룹의 공통 목표가 명확하다',
-        type: 'scale',
-        scaleRange: { 
-          min: 1, 
-          max: 5, 
-          labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다'] 
-        },
-        required: true
-      }
-    ];
+    if (!group) return;
 
-    setQuestions(mockQuestions);
-    setIsLoading(false);
+    try {
+      const functions = getFunctions();
+      const getGroupDiagnosisQuestions = httpsCallable(functions, 'getGroupDiagnosisQuestions');
+      
+      const result = await getGroupDiagnosisQuestions({ groupType: group.type });
+      if (result.data.success) {
+        setQuestions(result.data.questions);
+      } else {
+        throw new Error('질문 로드 실패');
+      }
+    } catch (error) {
+      console.error('질문 로드 오류:', error);
+      // 기본 질문 사용
+      const mockQuestions: DiagnosisQuestion[] = [
+        {
+          id: 'comm_1',
+          category: 'communication',
+          question: '우리 그룹에서 서로의 의견을 자유롭게 표현할 수 있다',
+          type: 'scale',
+          scaleRange: { 
+            min: 1, 
+            max: 5, 
+            labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다'] 
+          },
+          required: true
+        },
+        {
+          id: 'trust_1',
+          category: 'trust',
+          question: '그룹 멤버들을 완전히 신뢰한다',
+          type: 'scale',
+          scaleRange: { 
+            min: 1, 
+            max: 5, 
+            labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다'] 
+          },
+          required: true
+        },
+        {
+          id: 'support_1',
+          category: 'support',
+          question: '어려운 일이 있을 때 그룹 멤버들에게 도움을 요청할 수 있다',
+          type: 'scale',
+          scaleRange: { 
+            min: 1, 
+            max: 5, 
+            labels: ['전혀 그렇지 않다', '그렇지 않다', '보통이다', '그렇다', '매우 그렇다'] 
+          },
+          required: true
+        }
+      ];
+      setQuestions(mockQuestions);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const checkCompletionStatus = async () => {
@@ -232,7 +202,7 @@ const GroupDiagnosisPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!user || !groupId) return;
+    if (!user || !groupId || !group) return;
 
     // 모든 필수 질문 답변 확인
     const unansweredRequired = questions.filter(q => 
@@ -246,21 +216,42 @@ const GroupDiagnosisPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      // 응답 저장
-      const diagnosisData = {
-        groupId,
+      const functions = getFunctions();
+      const analyzeGroupDiagnosis = httpsCallable(functions, 'analyzeGroupDiagnosis');
+      
+      // 응답을 Firebase Functions 형식으로 변환
+      const diagnosisResponses = Object.keys(responses).map(questionId => ({
         userId: user.uid,
-        responses,
-        completedAt: new Date(),
-        version: '1.0'
-      };
+        questionId,
+        response: responses[questionId],
+        timestamp: new Date()
+      }));
 
-      await addDoc(collection(db, 'group_diagnosis_responses'), diagnosisData);
-      
-      toast.success('진단을 완료했습니다! 🎉');
-      
-      // 모든 멤버가 완료했는지 확인 후 결과 페이지로 이동
-      navigate(`/groups/${groupId}/diagnosis/results`);
+      const result = await analyzeGroupDiagnosis({
+        groupId,
+        groupType: group.type,
+        responses: diagnosisResponses
+      });
+
+      if (result.data.success) {
+        // 응답 저장
+        const diagnosisData = {
+          groupId,
+          userId: user.uid,
+          responses,
+          completedAt: new Date(),
+          version: '2.0'
+        };
+
+        await addDoc(collection(db, 'group_diagnosis_responses'), diagnosisData);
+        
+        toast.success('진단을 완료했습니다! 🎉');
+        
+        // 결과 페이지로 이동
+        navigate(`/groups/${groupId}/diagnosis/results`);
+      } else {
+        throw new Error('분석 실패');
+      }
       
     } catch (error) {
       console.error('진단 제출 오류:', error);

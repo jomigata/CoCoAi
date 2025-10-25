@@ -25,6 +25,9 @@ import { BadgeService } from './services/badgeService';
 // 개인 프로파일링 서비스
 import { PersonalProfilingService } from './services/personalProfilingService';
 
+// 그룹 진단 서비스
+import { GroupDiagnosisService } from './services/groupDiagnosisService';
+
 // OpenAI 초기화 (환경변수에서 API 키 가져오기)
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
@@ -114,6 +117,87 @@ export const getProfilingResult = functions.https.onCall(async (data, context) =
     
   } catch (error) {
     console.error('프로파일링 결과 조회 오류:', error);
+    throw new functions.https.HttpsError('internal', '결과 조회 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🧠 그룹 진단 질문 세트 조회 함수
+ * 그룹 유형별 맞춤형 질문 제공
+ */
+export const getGroupDiagnosisQuestions = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { groupType } = data;
+    
+    const diagnosisService = new GroupDiagnosisService();
+    const questions = await diagnosisService.getGroupDiagnosisQuestions(groupType);
+    
+    return { 
+      success: true, 
+      questions,
+      totalQuestions: questions.length,
+      estimatedTime: Math.ceil(questions.length * 0.5) // 질문당 30초 추정
+    };
+    
+  } catch (error) {
+    console.error('그룹 진단 질문 조회 오류:', error);
+    throw new functions.https.HttpsError('internal', '질문 조회 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🧠 그룹 진단 결과 분석 함수
+ * 심리상담가 1,2가 설계한 그룹 분석 알고리즘 적용
+ */
+export const analyzeGroupDiagnosis = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { groupId, groupType, responses } = data;
+    
+    const diagnosisService = new GroupDiagnosisService();
+    const result = await diagnosisService.analyzeGroupDiagnosis(groupId, groupType, responses);
+    
+    return { 
+      success: true, 
+      result,
+      version: '2.0'
+    };
+    
+  } catch (error) {
+    console.error('그룹 진단 분석 오류:', error);
+    throw new functions.https.HttpsError('internal', '분석 중 오류가 발생했습니다.');
+  }
+});
+
+/**
+ * 🧠 그룹 진단 결과 조회 함수
+ */
+export const getGroupDiagnosisResult = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+    }
+
+    const { groupId } = data;
+    
+    const diagnosisService = new GroupDiagnosisService();
+    const result = await diagnosisService.getGroupDiagnosisResult(groupId);
+    
+    return { 
+      success: true, 
+      result,
+      hasResult: result !== null
+    };
+    
+  } catch (error) {
+    console.error('그룹 진단 결과 조회 오류:', error);
     throw new functions.https.HttpsError('internal', '결과 조회 중 오류가 발생했습니다.');
   }
 });

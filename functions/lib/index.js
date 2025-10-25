@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.api = exports.getReceivedPraises = exports.sendPraise = exports.checkAndUpdateBadges = exports.getUserBadgeProgress = exports.getUserStats = exports.simulatePlantGrowth = exports.updateGardenFromGroupActivity = exports.performGardenAction = exports.getUserGarden = exports.analyzeGroupValues = exports.createPersonalizedMessage = exports.createEmotionDiary = exports.getConversationStarters = exports.createGrowthProgram = exports.analyzeDream = exports.generatePersonalGrowthReport = exports.saveRecommendationFeedback = exports.generateRecommendations = exports.analyzeMoodPatterns = exports.processAIChat = exports.sendGroupInvitation = exports.generateGroupReport = exports.getProfilingResult = exports.analyzeProfilingResults = exports.getProfilingQuestions = void 0;
+exports.api = exports.getReceivedPraises = exports.sendPraise = exports.checkAndUpdateBadges = exports.getUserBadgeProgress = exports.getUserStats = exports.simulatePlantGrowth = exports.updateGardenFromGroupActivity = exports.performGardenAction = exports.getUserGarden = exports.analyzeGroupValues = exports.createPersonalizedMessage = exports.createEmotionDiary = exports.getConversationStarters = exports.createGrowthProgram = exports.analyzeDream = exports.generatePersonalGrowthReport = exports.saveRecommendationFeedback = exports.generateRecommendations = exports.analyzeMoodPatterns = exports.processAIChat = exports.sendGroupInvitation = exports.generateGroupReport = exports.getGroupDiagnosisResult = exports.analyzeGroupDiagnosis = exports.getGroupDiagnosisQuestions = exports.getProfilingResult = exports.analyzeProfilingResults = exports.getProfilingQuestions = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const openai_1 = require("openai");
@@ -59,6 +59,8 @@ const gardenService_1 = require("./services/gardenService");
 const badgeService_1 = require("./services/badgeService");
 // 개인 프로파일링 서비스
 const personalProfilingService_1 = require("./services/personalProfilingService");
+// 그룹 진단 서비스
+const groupDiagnosisService_1 = require("./services/groupDiagnosisService");
 // OpenAI 초기화 (환경변수에서 API 키 가져오기)
 const openai = new openai_1.OpenAI({
     apiKey: process.env.OPENAI_API_KEY || '',
@@ -134,6 +136,75 @@ exports.getProfilingResult = functions.https.onCall(async (data, context) => {
     }
     catch (error) {
         console.error('프로파일링 결과 조회 오류:', error);
+        throw new functions.https.HttpsError('internal', '결과 조회 중 오류가 발생했습니다.');
+    }
+});
+/**
+ * 🧠 그룹 진단 질문 세트 조회 함수
+ * 그룹 유형별 맞춤형 질문 제공
+ */
+exports.getGroupDiagnosisQuestions = functions.https.onCall(async (data, context) => {
+    try {
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+        }
+        const { groupType } = data;
+        const diagnosisService = new groupDiagnosisService_1.GroupDiagnosisService();
+        const questions = await diagnosisService.getGroupDiagnosisQuestions(groupType);
+        return {
+            success: true,
+            questions,
+            totalQuestions: questions.length,
+            estimatedTime: Math.ceil(questions.length * 0.5) // 질문당 30초 추정
+        };
+    }
+    catch (error) {
+        console.error('그룹 진단 질문 조회 오류:', error);
+        throw new functions.https.HttpsError('internal', '질문 조회 중 오류가 발생했습니다.');
+    }
+});
+/**
+ * 🧠 그룹 진단 결과 분석 함수
+ * 심리상담가 1,2가 설계한 그룹 분석 알고리즘 적용
+ */
+exports.analyzeGroupDiagnosis = functions.https.onCall(async (data, context) => {
+    try {
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+        }
+        const { groupId, groupType, responses } = data;
+        const diagnosisService = new groupDiagnosisService_1.GroupDiagnosisService();
+        const result = await diagnosisService.analyzeGroupDiagnosis(groupId, groupType, responses);
+        return {
+            success: true,
+            result,
+            version: '2.0'
+        };
+    }
+    catch (error) {
+        console.error('그룹 진단 분석 오류:', error);
+        throw new functions.https.HttpsError('internal', '분석 중 오류가 발생했습니다.');
+    }
+});
+/**
+ * 🧠 그룹 진단 결과 조회 함수
+ */
+exports.getGroupDiagnosisResult = functions.https.onCall(async (data, context) => {
+    try {
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+        }
+        const { groupId } = data;
+        const diagnosisService = new groupDiagnosisService_1.GroupDiagnosisService();
+        const result = await diagnosisService.getGroupDiagnosisResult(groupId);
+        return {
+            success: true,
+            result,
+            hasResult: result !== null
+        };
+    }
+    catch (error) {
+        console.error('그룹 진단 결과 조회 오류:', error);
         throw new functions.https.HttpsError('internal', '결과 조회 중 오류가 발생했습니다.');
     }
 });
