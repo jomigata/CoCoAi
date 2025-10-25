@@ -29,6 +29,10 @@ import PersonalGrowthPage from '@pages/Growth/PersonalGrowthPage';
 
 // Phase 2: 소통 개선 도구 페이지들
 import ConversationStarterPage from '@pages/Communication/ConversationStarterPage';
+import CommunicationPage from '@pages/Communication/CommunicationPage';
+import EmotionDiaryPage from '@pages/Communication/EmotionDiaryPage';
+import MessageTemplatePage from '@pages/Communication/MessageTemplatePage';
+import ValueAnalysisPage from '@pages/Communication/ValueAnalysisPage';
 
 // 컨텍스트 임포트
 import { AuthProvider } from '@store/AuthContext';
@@ -72,8 +76,12 @@ function App() {
                 <Route path="/counselor-matching" element={<CounselorMatchingPage />} />
                 <Route path="/growth" element={<PersonalGrowthPage />} />
                 
-                {/* Phase 2: 소통 개선 도구 라우트 */}
+                {/* Phase 2: 소통 개선 도구 */}
+                <Route path="/communication" element={<CommunicationPage />} />
                 <Route path="/communication/starters" element={<ConversationStarterPage />} />
+                <Route path="/communication/diary" element={<EmotionDiaryPage />} />
+                <Route path="/communication/messages" element={<MessageTemplatePage />} />
+                <Route path="/communication/values" element={<ValueAnalysisPage />} />
                 
                 {/* 404 페이지 */}
                 <Route path="*" element={<NotFoundPage />} />

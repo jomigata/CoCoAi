@@ -37,9 +37,11 @@ const Sidebar: React.FC = () => {
 
   // Phase 2: 소통 개선 도구 메뉴
   const communicationItems = [
+    { name: '소통 도구', href: '/communication', icon: MessageSquare },
     { name: '대화 스타터', href: '/communication/starters', icon: MessageSquare },
     { name: '감정 교환 일기', href: '/communication/diary', icon: BookOpen },
     { name: '메시지 템플릿', href: '/communication/messages', icon: Gift },
+    { name: '가치관 분석', href: '/communication/values', icon: BarChart3 },
   ];
 
   const adminItems = [
