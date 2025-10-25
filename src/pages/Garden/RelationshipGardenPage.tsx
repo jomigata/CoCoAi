@@ -367,64 +367,6 @@ const RelationshipGardenPage: React.FC = () => {
     }
   };
 
-  const handlePlantAction = async (action: GardenAction, plant?: Plant) => {
-    if (!garden || !action.available) return;
-
-    try {
-      switch (action.type) {
-        case 'water':
-          if (plant) {
-            const updatedPlant = {
-              ...plant,
-              health: Math.min(100, plant.health + 10),
-              lastWatered: new Date()
-            };
-            
-            const updatedGarden = {
-              ...garden,
-              plants: garden.plants.map(p => p.id === plant.id ? updatedPlant : p),
-              resources: {
-                ...garden.resources,
-                water: garden.resources.water - 1
-              }
-            };
-            
-            setGarden(updatedGarden);
-            setSelectedPlant(updatedPlant);
-            toast.success(`${plant.name}에 물을 주었습니다! 💧`);
-          }
-          break;
-          
-        case 'fertilize':
-          if (plant) {
-            const updatedPlant = {
-              ...plant,
-              happiness: Math.min(100, plant.happiness + 15)
-            };
-            
-            const updatedGarden = {
-              ...garden,
-              plants: garden.plants.map(p => p.id === plant.id ? updatedPlant : p),
-              resources: {
-                ...garden.resources,
-                fertilizer: garden.resources.fertilizer - 1
-              }
-            };
-            
-            setGarden(updatedGarden);
-            setSelectedPlant(updatedPlant);
-            toast.success(`${plant.name}에 영양분을 주었습니다! 🌱`);
-          }
-          break;
-      }
-      
-      setAvailableActions(getAvailableActions(garden));
-    } catch (error) {
-      console.error('정원 액션 오류:', error);
-      toast.error('작업 중 오류가 발생했습니다.');
-    }
-  };
-
   if (isLoading) {
     return <LoadingSpinner message="정원을 불러오고 있습니다..." />;
   }
@@ -744,7 +686,7 @@ const RelationshipGardenPage: React.FC = () => {
 
         {/* AI 경고 */}
         <div className="mt-8">
-          <AIWarning warningData={aiWarning} />
+          <AIWarning {...aiWarning} />
         </div>
       </div>
     </div>

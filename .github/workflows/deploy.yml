@@ -27,6 +27,13 @@ jobs:
         with:
           lfs: true
 
+      - name: 🔧 Git 인코딩 설정
+        run: |
+          git config --global core.quotepath false
+          git config --global i18n.commitencoding utf-8
+          git config --global i18n.logoutputencoding utf-8
+          echo "Git 인코딩 설정 완료"
+
       - name: 🟢 Node.js 설정
         uses: actions/setup-node@v4
         with:
