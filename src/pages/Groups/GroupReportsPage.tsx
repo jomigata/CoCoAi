@@ -355,7 +355,7 @@ const GroupReportsPage: React.FC = () => {
             <div className="text-center mt-4">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                 <Brain className="w-4 h-4 mr-1" />
-                AI 분석 엔진 v{selectedReport.reportResult?.aiWarning?.version}
+                AI 분석 엔진 v{selectedReport?.reportResult?.aiWarning?.version}
               </span>
             </div>
           )}
@@ -429,29 +429,29 @@ const GroupReportsPage: React.FC = () => {
                             <div className="w-32 h-32 rounded-full bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
                               <div className="text-center">
                                 <div className="text-4xl font-bold text-gray-900">
-                                  {selectedReport.reportResult?.groupMoodTemperature?.score || 'N/A'}
+                                  {selectedReport?.reportResult?.groupMoodTemperature?.score || 'N/A'}
                                 </div>
                                 <div className="text-body-small text-gray-600">/ 10</div>
                               </div>
                             </div>
                             <div className="absolute -top-2 -right-2">
-                              {getTrendIcon(selectedReport.reportResult?.groupMoodTemperature?.trend || 'stable')}
+                              {getTrendIcon(selectedReport?.reportResult?.groupMoodTemperature?.trend || 'stable')}
                             </div>
                           </div>
                         </div>
 
                         <div className="text-center">
                           <p className="text-body-large text-gray-700 mb-4">
-                            {selectedReport.reportResult?.groupMoodTemperature?.description || '분석 데이터가 부족합니다.'}
+                            {selectedReport?.reportResult?.groupMoodTemperature?.description || '분석 데이터가 부족합니다.'}
                           </p>
                           <div className="flex items-center justify-center space-x-6 text-body-medium text-gray-600">
                             <div className="flex items-center">
                               <Calendar className="w-4 h-4 mr-2" />
-                              {new Date(selectedReport.weekStartDate).toLocaleDateString('ko-KR')} - {new Date(selectedReport.weekEndDate).toLocaleDateString('ko-KR')}
+                              {new Date(selectedReport?.weekStartDate || new Date()).toLocaleDateString('ko-KR')} - {new Date(selectedReport?.weekEndDate || new Date()).toLocaleDateString('ko-KR')}
                             </div>
                             <div className="flex items-center">
                               <Users className="w-4 h-4 mr-2" />
-                              {selectedReport.memberCount}명 참여
+                              {selectedReport?.memberCount || 0}명 참여
                             </div>
                           </div>
                         </div>
@@ -477,7 +477,7 @@ const GroupReportsPage: React.FC = () => {
 
                     {expandedSections.members && (
                       <div className="space-y-6">
-                        {(selectedReport.reportResult?.memberPatterns || []).map((member, index) => (
+                        {(selectedReport?.reportResult?.memberPatterns || []).map((member, index) => (
                           <div key={index} className="border border-gray-200 rounded-lg p-4">
                             <div className="flex items-center justify-between mb-4">
                               <h4 className="text-title-medium text-gray-900">
@@ -554,7 +554,7 @@ const GroupReportsPage: React.FC = () => {
                             공통 감정
                           </h4>
                           <ul className="space-y-2">
-                            {(selectedReport.reportResult?.connectionInsights?.sharedMoods || []).map((mood, i) => (
+                            {(selectedReport?.reportResult?.connectionInsights?.sharedMoods || []).map((mood, i) => (
                               <li key={i} className="text-body-small text-green-700">
                                 • {mood}
                               </li>
@@ -568,7 +568,7 @@ const GroupReportsPage: React.FC = () => {
                             상호 보완
                           </h4>
                           <ul className="space-y-2">
-                            {(selectedReport.reportResult?.connectionInsights?.complementaryPatterns || []).map((pattern, i) => (
+                            {(selectedReport?.reportResult?.connectionInsights?.complementaryPatterns || []).map((pattern, i) => (
                               <li key={i} className="text-body-small text-blue-700">
                                 • {pattern}
                               </li>
@@ -582,7 +582,7 @@ const GroupReportsPage: React.FC = () => {
                             관심 영역
                           </h4>
                           <ul className="space-y-2">
-                            {(selectedReport.reportResult?.connectionInsights?.concernAreas || []).map((area, i) => (
+                            {(selectedReport?.reportResult?.connectionInsights?.concernAreas || []).map((area, i) => (
                               <li key={i} className="text-body-small text-orange-700">
                                 • {area}
                               </li>
@@ -611,7 +611,7 @@ const GroupReportsPage: React.FC = () => {
 
                     {expandedSections.recommendations && (
                       <div className="space-y-6">
-                        {(selectedReport.reportResult?.recommendations || []).map((rec, index) => (
+                        {(selectedReport?.reportResult?.recommendations || []).map((rec, index) => (
                           <div key={index} className="border border-gray-200 rounded-lg p-4">
                             <div className="flex items-start justify-between mb-4">
                               <div className="flex items-center">
