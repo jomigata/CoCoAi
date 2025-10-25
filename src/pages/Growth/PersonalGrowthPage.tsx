@@ -13,7 +13,6 @@ import {
   Brain,
   Heart,
   Zap,
-  Award,
   RefreshCw,
   Star,
   Moon
