@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '@config/firebase';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import toast from 'react-hot-toast';
 import { 
   Brain, 
@@ -42,6 +43,8 @@ const PersonalProfilingPage: React.FC = () => {
   const [responses, setResponses] = useState<{ [key: string]: any }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [hasExistingProfile, setHasExistingProfile] = useState(false);
+  const [questions, setQuestions] = useState<ProfilingQuestion[]>([]);
+  const [ageGroup, setAgeGroup] = useState<string>('20s');
 
   // 개인 종합 프로파일링 질문들
   const profilingQuestions: ProfilingQuestion[] = [
@@ -185,7 +188,8 @@ const PersonalProfilingPage: React.FC = () => {
 
   useEffect(() => {
     checkExistingProfile();
-  }, [user]);
+    loadQuestions();
+  }, [user, ageGroup]);
 
   const checkExistingProfile = async () => {
     if (!user) return;
@@ -200,6 +204,24 @@ const PersonalProfilingPage: React.FC = () => {
     }
   };
 
+  const loadQuestions = async () => {
+    if (!user) return;
+
+    try {
+      const functions = getFunctions();
+      const getProfilingQuestions = httpsCallable(functions, 'getProfilingQuestions');
+      
+      const result = await getProfilingQuestions({ ageGroup });
+      if (result.data.success) {
+        setQuestions(result.data.questions);
+      }
+    } catch (error) {
+      console.error('질문 로드 오류:', error);
+      // 기본 질문 사용
+      setQuestions(profilingQuestions);
+    }
+  };
+
   const handleResponse = (questionId: string, value: any) => {
     setResponses(prev => ({
       ...prev,
@@ -208,14 +230,14 @@ const PersonalProfilingPage: React.FC = () => {
   };
 
   const handleNext = () => {
-    const currentQuestion = profilingQuestions[currentStep];
+    const currentQuestion = questions[currentStep];
     
-    if (currentQuestion.required && !responses[currentQuestion.id]) {
+    if (currentQuestion?.required && !responses[currentQuestion.id]) {
       toast.error('필수 질문에 답변해주세요.');
       return;
     }
 
-    if (currentStep < totalSteps - 1) {
+    if (currentStep < questions.length - 1) {
       setCurrentStep(prev => prev + 1);
     } else {
       handleSubmit();
@@ -301,21 +323,32 @@ const PersonalProfilingPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const profileData = calculateProfilingData();
-      const mindMap = generateMindMap(profileData);
+      const functions = getFunctions();
+      const analyzeProfilingResults = httpsCallable(functions, 'analyzeProfilingResults');
+      
+      const result = await analyzeProfilingResults({
+        userId: user.uid,
+        ageGroup,
+        responses
+      });
 
-      // 사용자 문서 업데이트
-      await setDoc(doc(db, 'users', user.uid), {
-        personalProfile: {
-          ageGroup: getAgeGroup(), // 사용자 나이대 계산 함수 필요
-          completedAt: new Date(),
-          profileData,
-          mindMap
-        }
-      }, { merge: true });
+      if (result.data.success) {
+        // 사용자 문서 업데이트
+        await setDoc(doc(db, 'users', user.uid), {
+          personalProfile: {
+            ageGroup,
+            completedAt: new Date(),
+            profileData: result.data.result.scores,
+            mindMap: result.data.result.mindMap,
+            aiAnalysis: result.data.result.aiAnalysis
+          }
+        }, { merge: true });
 
-      toast.success('개인 프로파일링이 완료되었습니다!');
-      navigate('/profile/results');
+        toast.success('개인 프로파일링이 완료되었습니다!');
+        navigate('/profile/results');
+      } else {
+        throw new Error('분석 실패');
+      }
     } catch (error) {
       console.error('프로파일링 저장 오류:', error);
       toast.error('프로파일링 저장 중 오류가 발생했습니다.');
@@ -331,7 +364,7 @@ const PersonalProfilingPage: React.FC = () => {
   };
 
   const renderQuestion = () => {
-    const question = profilingQuestions[currentStep];
+    const question = questions[currentStep];
     
     switch (question.type) {
       case 'scale':
@@ -476,8 +509,19 @@ const PersonalProfilingPage: React.FC = () => {
     );
   }
 
-  const currentQuestion = profilingQuestions[currentStep];
-  const progress = ((currentStep + 1) / totalSteps) * 100;
+  const currentQuestion = questions[currentStep];
+  const progress = questions.length > 0 ? ((currentStep + 1) / questions.length) * 100 : 0;
+
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-primary flex items-center justify-center">
+        <div className="text-center">
+          <div className="loading-spinner mx-auto mb-4" />
+          <p className="text-gray-600">프로파일링 질문을 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-primary">
@@ -496,7 +540,7 @@ const PersonalProfilingPage: React.FC = () => {
         <div className="max-w-4xl mx-auto mb-8">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-gray-700">
-              {currentStep + 1} / {totalSteps}
+              {currentStep + 1} / {questions.length}
             </span>
             <span className="text-sm font-medium text-gray-700">
               {Math.round(progress)}% 완료
@@ -569,7 +613,7 @@ const PersonalProfilingPage: React.FC = () => {
                     <div className="loading-spinner mr-2" />
                     처리 중...
                   </>
-                ) : currentStep === totalSteps - 1 ? (
+                ) : currentStep === questions.length - 1 ? (
                   <>
                     완료하기
                     <CheckCircle className="w-5 h-5 ml-2" />

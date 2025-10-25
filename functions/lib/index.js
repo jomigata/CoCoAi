@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.api = exports.getReceivedPraises = exports.sendPraise = exports.checkAndUpdateBadges = exports.getUserBadgeProgress = exports.getUserStats = exports.simulatePlantGrowth = exports.updateGardenFromGroupActivity = exports.performGardenAction = exports.getUserGarden = exports.analyzeGroupValues = exports.createPersonalizedMessage = exports.createEmotionDiary = exports.getConversationStarters = exports.createGrowthProgram = exports.analyzeDream = exports.generatePersonalGrowthReport = exports.saveRecommendationFeedback = exports.generateRecommendations = exports.analyzeMoodPatterns = exports.processAIChat = exports.sendGroupInvitation = exports.generateGroupReport = exports.analyzeProfilingResults = void 0;
+exports.api = exports.getReceivedPraises = exports.sendPraise = exports.checkAndUpdateBadges = exports.getUserBadgeProgress = exports.getUserStats = exports.simulatePlantGrowth = exports.updateGardenFromGroupActivity = exports.performGardenAction = exports.getUserGarden = exports.analyzeGroupValues = exports.createPersonalizedMessage = exports.createEmotionDiary = exports.getConversationStarters = exports.createGrowthProgram = exports.analyzeDream = exports.generatePersonalGrowthReport = exports.saveRecommendationFeedback = exports.generateRecommendations = exports.analyzeMoodPatterns = exports.processAIChat = exports.sendGroupInvitation = exports.generateGroupReport = exports.getProfilingResult = exports.analyzeProfilingResults = exports.getProfilingQuestions = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const openai_1 = require("openai");
@@ -57,6 +57,8 @@ const valueAnalysisService_1 = require("./services/valueAnalysisService");
 // Phase 2 Week 9-10: 게이미피케이션 서비스들
 const gardenService_1 = require("./services/gardenService");
 const badgeService_1 = require("./services/badgeService");
+// 개인 프로파일링 서비스
+const personalProfilingService_1 = require("./services/personalProfilingService");
 // OpenAI 초기화 (환경변수에서 API 키 가져오기)
 const openai = new openai_1.OpenAI({
     apiKey: process.env.OPENAI_API_KEY || '',
@@ -67,63 +69,72 @@ const corsHandler = (0, cors_1.default)({ origin: true });
 const app = (0, express_1.default)();
 app.use(corsHandler);
 /**
+ * 🧠 개인 프로파일링 질문 세트 조회 함수
+ * 연령대별 맞춤형 질문 제공
+ */
+exports.getProfilingQuestions = functions.https.onCall(async (data, context) => {
+    try {
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+        }
+        const { ageGroup } = data;
+        const profilingService = new personalProfilingService_1.PersonalProfilingService();
+        const questions = await profilingService.getPersonalizedQuestions(ageGroup);
+        return {
+            success: true,
+            questions,
+            totalQuestions: questions.length,
+            estimatedTime: Math.ceil(questions.length * 0.5) // 질문당 30초 추정
+        };
+    }
+    catch (error) {
+        console.error('프로파일링 질문 조회 오류:', error);
+        throw new functions.https.HttpsError('internal', '질문 조회 중 오류가 발생했습니다.');
+    }
+});
+/**
  * 🧠 개인 프로파일링 결과 분석 함수
  * 심리상담가 1,2가 설계한 분석 알고리즘 적용
  */
 exports.analyzeProfilingResults = functions.https.onCall(async (data, context) => {
     try {
-        // 인증 확인
         if (!context.auth) {
             throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
         }
-        const { userId, responses } = data;
-        // AI 분석 프롬프트 (심리상담가 전문 지식 기반)
-        const analysisPrompt = `
-    당신은 30년 경력의 전문 심리상담가입니다. 다음 프로파일링 응답을 분석해주세요:
-    
-    응답 데이터: ${JSON.stringify(responses)}
-    
-    다음 항목들을 분석해주세요:
-    1. 자아존중감 수준 (1-5점)
-    2. 스트레스 대처 방식 유형
-    3. 대인관계 패턴
-    4. 핵심 가치관
-    5. 개선 권장사항 (실천 가능한 3가지)
-    
-    ⚠️ 중요: 이 분석은 AI 기반이므로 완전하지 않을 수 있습니다. 전문가 상담을 권장합니다.
-    
-    JSON 형태로 응답해주세요.
-    `;
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4",
-            messages: [{ role: "user", content: analysisPrompt }],
-            temperature: 0.7,
-        });
-        const analysisResult = JSON.parse(completion.choices[0].message.content || '{}');
-        // AI 편향성 경고 메시지 추가
-        analysisResult.aiWarning = {
-            message: "⚠️ AI 분석 결과 안내",
-            details: [
-                "이 분석은 AI 기반으로 제공되며, 완전하지 않을 수 있습니다.",
-                "개인의 복잡한 심리 상태를 완전히 반영하지 못할 수 있습니다.",
-                "정확한 진단을 위해서는 전문 심리상담사와의 상담을 권장합니다.",
-                "이 결과는 참고용으로만 활용해주세요."
-            ],
-            timestamp: new Date().toISOString()
+        const { userId, ageGroup, responses } = data;
+        const profilingService = new personalProfilingService_1.PersonalProfilingService();
+        const result = await profilingService.analyzeProfilingResponses(userId, ageGroup, responses);
+        return {
+            success: true,
+            result,
+            version: '2.0'
         };
-        // Firestore에 결과 저장
-        await db.collection('profiling_results').doc(userId).set({
-            userId,
-            responses,
-            analysisResult,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-        return { success: true, analysisResult };
     }
     catch (error) {
         console.error('프로파일링 분석 오류:', error);
         throw new functions.https.HttpsError('internal', '분석 중 오류가 발생했습니다.');
+    }
+});
+/**
+ * 🧠 개인 프로파일링 결과 조회 함수
+ */
+exports.getProfilingResult = functions.https.onCall(async (data, context) => {
+    try {
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', '로그인이 필요합니다.');
+        }
+        const { userId } = data;
+        const profilingService = new personalProfilingService_1.PersonalProfilingService();
+        const result = await profilingService.getProfilingResult(userId);
+        return {
+            success: true,
+            result,
+            hasResult: result !== null
+        };
+    }
+    catch (error) {
+        console.error('프로파일링 결과 조회 오류:', error);
+        throw new functions.https.HttpsError('internal', '결과 조회 중 오류가 발생했습니다.');
     }
 });
 /**
