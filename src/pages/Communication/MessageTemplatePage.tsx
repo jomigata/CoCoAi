@@ -9,15 +9,12 @@ import {
   Copy,
   Send,
   Star,
-  Smile,
   ThumbsUp,
-  Share2,
-  Download
+  Share2
 } from 'lucide-react';
 import { AIWarning } from '../../components/Common/AIWarning';
 import { useAIWarning } from '../../hooks/useAIWarning';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
-import ErrorMessage from '../../components/Common/ErrorMessage';
 
 interface MessageTemplate {
   id: string;
@@ -107,29 +104,6 @@ const MessageTemplatePage: React.FC = () => {
       setTemplates(getMockTemplates());
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const generatePersonalizedMessage = async (templateId: string, variables: { [key: string]: string }) => {
-    if (!user) return;
-
-    try {
-      const createPersonalizedMessage = httpsCallable(functions, 'createPersonalizedMessage');
-      const result = await createPersonalizedMessage({
-        templateId,
-        variables,
-        userId: user.uid
-      });
-      
-      const data = result.data as { success: boolean; message: PersonalizedMessage };
-      
-      if (data.success) {
-        setPersonalizedMessage(data.message);
-        toast.success('개인화된 메시지가 생성되었습니다!');
-      }
-    } catch (error) {
-      console.error('개인화 메시지 생성 오류:', error);
-      toast.error('개인화 메시지 생성 중 오류가 발생했습니다.');
     }
   };
 

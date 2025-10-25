@@ -7,7 +7,6 @@ import {
   Users, 
   TrendingUp,
   BarChart3,
-  PieChart,
   Activity,
   Lightbulb,
   Heart,
@@ -20,7 +19,8 @@ import {
   Compass,
   Eye,
   Brain,
-  Sparkles
+  Sparkles,
+  User
 } from 'lucide-react';
 import { AIWarning } from '../../components/Common/AIWarning';
 import { useAIWarning } from '../../hooks/useAIWarning';
@@ -102,11 +102,10 @@ const ValueAnalysisPage: React.FC = () => {
   const [analysis, setAnalysis] = useState<ValueAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'personal' | 'group' | 'comparison' | 'insights'>('personal');
-  const [selectedValue, setSelectedValue] = useState<PersonalValue | GroupValue | null>(null);
 
   // AI 경고 시스템
   const aiWarning = useAIWarning({
-    analysisType: 'analysis',
+    analysisType: 'communication',
     severity: 'medium'
   });
 
