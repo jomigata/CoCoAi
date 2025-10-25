@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Eye, EyeOff, SkipForward } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface AccessibilityProviderProps {
   children: React.ReactNode;
