@@ -9,16 +9,12 @@ import {
   CheckCircle,
   Clock,
   Lightbulb,
-  ArrowRight,
   BarChart3,
   Brain,
   Heart,
   Zap,
   Award,
   RefreshCw,
-  Download,
-  Play,
-  Pause,
   Star,
   Moon
 } from 'lucide-react';
@@ -214,7 +210,7 @@ const PersonalGrowthPage: React.FC = () => {
       relationship_skills: <Target className="w-5 h-5" />,
       self_awareness: <Brain className="w-5 h-5" />,
       resilience: <Award className="w-5 h-5" />,
-      communication: <ArrowRight className="w-5 h-5" />
+      communication: <Target className="w-5 h-5" />
     };
     return icons[area as keyof typeof icons] || <Target className="w-5 h-5" />;
   };
