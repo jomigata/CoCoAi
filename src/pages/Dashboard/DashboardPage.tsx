@@ -1,9 +1,25 @@
 import React from 'react';
 import { useAuth } from '@store/AuthContext';
 import { BarChart3, MessageCircle, Calendar, Users, TrendingUp, Activity } from 'lucide-react';
+import { Navigate } from 'react-router-dom';
+import LoadingSpinner from '@components/Common/LoadingSpinner';
 
 const DashboardPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  // 로딩 중일 때 스피너 표시
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // 사용자가 로그인하지 않은 경우 로그인 페이지로 리다이렉트
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   const stats = [
     { name: '총 상담 세션', value: '24', icon: MessageCircle, change: '+12%', changeType: 'positive' },
