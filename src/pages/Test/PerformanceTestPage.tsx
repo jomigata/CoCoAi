@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Activity, AlertTriangle, Clock, Database, Wifi, Zap, Play, Stop, RotateCcw, Smartphone, Image, Server } from 'lucide-react';
+import React, { useState } from 'react';
+import { Activity, AlertTriangle, Play, RotateCcw, Smartphone, Image, Server } from 'lucide-react';
 import PerformanceDashboard from '@components/Common/PerformanceDashboard';
 import { usePerformanceMonitor } from '@utils/performanceMonitor';
 import { useErrorTracker } from '@utils/errorTracker';
@@ -65,7 +65,7 @@ const PerformanceTestPage: React.FC = () => {
       ];
 
       const promises = imageUrls.map(url => {
-        return new Promise((resolve, reject) => {
+        return new Promise<HTMLImageElement>((resolve, reject) => {
           const img = new Image();
           img.onload = () => resolve(img);
           img.onerror = () => reject(new Error(`Failed to load ${url}`));
@@ -99,8 +99,8 @@ const PerformanceTestPage: React.FC = () => {
     if ('memory' in performance) {
       const memory = (performance as any).memory;
       return {
-        memoryUsed: memory.usedJSHeapSize,
-        memoryLimit: memory.jsHeapSizeLimit
+        memoryUsed: memory.usedJSHeapSize || 0,
+        memoryLimit: memory.jsHeapSizeLimit || 0
       };
     }
     return { memoryUsed: 0, memoryLimit: 0 };
@@ -477,8 +477,8 @@ const PerformanceTestPage: React.FC = () => {
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-300">메모리 사용량:</span>
                 <span className="font-medium text-gray-900 dark:text-white">
-                  {perfStats.memoryUsage ? 
-                    `${(perfStats.memoryUsage.usedJSHeapSize / (1024 * 1024)).toFixed(2)}MB` : 
+                  {perfStats.memoryUsage && typeof perfStats.memoryUsage === 'object' && 'usedJSHeapSize' in perfStats.memoryUsage ? 
+                    `${((perfStats.memoryUsage as any).usedJSHeapSize / (1024 * 1024)).toFixed(2)}MB` : 
                     'N/A'
                   }
                 </span>
