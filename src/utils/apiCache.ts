@@ -3,6 +3,7 @@ interface CacheConfig {
   ttl: number; // Time to live in milliseconds
   maxSize: number; // Maximum number of cached items
   strategy: 'memory' | 'indexeddb' | 'both' | 'cache-first' | 'network-first' | 'stale-while-revalidate';
+  storage?: 'memory' | 'indexeddb' | 'both'; // Storage type for caching
 }
 
 interface CachedResponse<T = any> {
@@ -24,6 +25,7 @@ class APICache {
       ttl: 5 * 60 * 1000, // 5분 기본 TTL
       maxSize: 100, // 최대 100개 항목
       strategy: 'both', // 메모리와 IndexedDB 모두 사용
+      storage: 'both', // 기본 저장소 타입
       ...config
     };
     
@@ -32,7 +34,7 @@ class APICache {
 
   // IndexedDB 초기화
   private async initIndexedDB() {
-    if (this.config.strategy === 'memory') return;
+    if (this.config.storage === 'memory') return;
 
     return new Promise<void>((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.dbVersion);
@@ -65,7 +67,7 @@ class APICache {
     const key = this.generateKey(url, params);
     
     // 메모리 캐시 확인
-    if (this.config.strategy === 'memory' || this.config.strategy === 'both') {
+    if (this.config.storage === 'memory' || this.config.storage === 'both') {
       const cached = this.memoryCache.get(key);
       if (cached && this.isValid(cached)) {
         console.log('API Cache: Hit (memory)', key);
@@ -74,12 +76,12 @@ class APICache {
     }
 
     // IndexedDB 캐시 확인
-    if (this.config.strategy === 'indexeddb' || this.config.strategy === 'both') {
+    if (this.config.storage === 'indexeddb' || this.config.storage === 'both') {
       const cached = await this.getFromIndexedDB(key);
       if (cached && this.isValid(cached)) {
         console.log('API Cache: Hit (indexeddb)', key);
         // 메모리 캐시에도 저장
-        if (this.config.strategy === 'both') {
+        if (this.config.storage === 'both') {
           this.memoryCache.set(key, cached);
         }
         return cached.data;
@@ -101,13 +103,13 @@ class APICache {
     };
 
     // 메모리 캐시에 저장
-    if (this.config.strategy === 'memory' || this.config.strategy === 'both') {
+    if (this.config.storage === 'memory' || this.config.storage === 'both') {
       this.memoryCache.set(key, cachedResponse);
       this.cleanupMemoryCache();
     }
 
     // IndexedDB에 저장
-    if (this.config.strategy === 'indexeddb' || this.config.strategy === 'both') {
+    if (this.config.storage === 'indexeddb' || this.config.storage === 'both') {
       await this.setToIndexedDB(cachedResponse);
     }
 
@@ -165,12 +167,12 @@ class APICache {
     const key = this.generateKey(url, params);
 
     // 메모리 캐시에서 삭제
-    if (this.config.strategy === 'memory' || this.config.strategy === 'both') {
+    if (this.config.storage === 'memory' || this.config.storage === 'both') {
       this.memoryCache.delete(key);
     }
 
     // IndexedDB에서 삭제
-    if (this.config.strategy === 'indexeddb' || this.config.strategy === 'both') {
+    if (this.config.storage === 'indexeddb' || this.config.storage === 'both') {
       await this.deleteFromIndexedDB(key);
     }
 
@@ -196,7 +198,7 @@ class APICache {
     const now = Date.now();
 
     // 메모리 캐시 정리
-    if (this.config.strategy === 'memory' || this.config.strategy === 'both') {
+    if (this.config.storage === 'memory' || this.config.storage === 'both') {
       for (const [key, cached] of this.memoryCache.entries()) {
         if (!this.isValid(cached)) {
           this.memoryCache.delete(key);
@@ -205,7 +207,7 @@ class APICache {
     }
 
     // IndexedDB 정리
-    if (this.config.strategy === 'indexeddb' || this.config.strategy === 'both') {
+    if (this.config.storage === 'indexeddb' || this.config.storage === 'both') {
       await this.cleanupIndexedDB(now);
     }
 
@@ -243,7 +245,7 @@ class APICache {
   // 캐시 통계
   getStats(): { memorySize: number; indexedDBSize: number } {
     return {
-      memorySize: this.memoryCache.size,
+      memorySize: this.config.storage === 'memory' || this.config.storage === 'both' ? this.memoryCache.size : 0,
       indexedDBSize: 0 // IndexedDB 크기는 별도로 계산 필요
     };
   }
@@ -251,12 +253,12 @@ class APICache {
   // 전체 캐시 클리어
   async clear(): Promise<void> {
     // 메모리 캐시 클리어
-    if (this.config.strategy === 'memory' || this.config.strategy === 'both') {
+    if (this.config.storage === 'memory' || this.config.storage === 'both') {
       this.memoryCache.clear();
     }
 
     // IndexedDB 클리어
-    if (this.config.strategy === 'indexeddb' || this.config.strategy === 'both') {
+    if (this.config.storage === 'indexeddb' || this.config.storage === 'both') {
       await this.clearIndexedDB();
     }
 
