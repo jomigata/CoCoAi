@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@store/AuthContext';
 import { 
   Home, 
-  MessageCircle, 
   BarChart3, 
   User, 
   Settings,

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Video, VideoOff, Mic, MicOff, Phone, PhoneOff, Users, Settings, Maximize2, Minimize2 } from 'lucide-react';
+import { Video, VideoOff, Mic, MicOff, PhoneOff, Users, Settings, Maximize2, Minimize2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface VideoCallProps {
@@ -21,20 +21,16 @@ interface Participant {
 
 const VideoCall: React.FC<VideoCallProps> = ({
   roomId,
-  userId,
   userName,
-  onCallEnd,
-  isCounselor = false
+  onCallEnd
 }) => {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [participants, setParticipants] = useState<Participant[]>([]);
   const [callStatus, setCallStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
 
   // 미디어 스트림 초기화

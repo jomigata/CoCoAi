@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@store/AuthContext';
-import { Star, Clock, MapPin, MessageCircle, Filter, Search, Users, Award, Heart } from 'lucide-react';
+import { Star, Clock, Filter, Search, Users, Award, Heart } from 'lucide-react';
 import LoadingSpinner from '@components/Common/LoadingSpinner';
 import AIWarning from '@components/Common/AIWarning';
 import { useAIWarning } from '@hooks/useAIWarning';
