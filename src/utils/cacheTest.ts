@@ -35,14 +35,14 @@ export class CacheTestSuite {
     
     try {
       // 첫 번째 요청 (캐시 미스)
-      const firstRequest = await cachedFetch('/api/test-cache-first', {}, {
+      await cachedFetch('/api/test-cache-first', {}, {
         strategy: 'cache-first',
         ttl: 5000,
         storage: 'memory'
       });
       
       // 두 번째 요청 (캐시 히트)
-      const secondRequest = await cachedFetch('/api/test-cache-first', {}, {
+      await cachedFetch('/api/test-cache-first', {}, {
         strategy: 'cache-first',
         ttl: 5000,
         storage: 'memory'
@@ -77,7 +77,7 @@ export class CacheTestSuite {
     const startTime = performance.now();
     
     try {
-      const response = await cachedFetch('/api/test-network-first', {}, {
+      await cachedFetch('/api/test-network-first', {}, {
         strategy: 'network-first',
         ttl: 3000,
         storage: 'both'
@@ -112,7 +112,7 @@ export class CacheTestSuite {
     const startTime = performance.now();
     
     try {
-      const response = await cachedFetch('/api/test-stale-revalidate', {}, {
+      await cachedFetch('/api/test-stale-revalidate', {}, {
         strategy: 'stale-while-revalidate',
         ttl: 2000,
         storage: 'both'
@@ -158,7 +158,7 @@ export class CacheTestSuite {
       await new Promise(resolve => setTimeout(resolve, 150));
       
       // 만료된 캐시 요청
-      const response = await cachedFetch('/api/test-expiration', {}, {
+      await cachedFetch('/api/test-expiration', {}, {
         strategy: 'cache-first',
         ttl: 100,
         storage: 'memory'
@@ -203,7 +203,7 @@ export class CacheTestSuite {
       });
       
       // 캐시된 데이터 요청
-      const response = await cachedFetch('/api/test-offline', {}, {
+      await cachedFetch('/api/test-offline', {}, {
         strategy: 'network-first',
         ttl: 10000,
         storage: 'both'
@@ -344,7 +344,7 @@ export class ImageOptimizationTest {
       ];
 
       const promises = imageUrls.map(url => {
-        return new Promise((resolve, reject) => {
+        return new Promise<HTMLImageElement>((resolve, reject) => {
           const img = new Image();
           img.onload = () => resolve(img);
           img.onerror = () => reject(new Error(`Failed to load ${url}`));

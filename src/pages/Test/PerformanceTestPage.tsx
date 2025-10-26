@@ -66,7 +66,7 @@ const PerformanceTestPage: React.FC = () => {
 
       const promises = imageUrls.map(url => {
         return new Promise<HTMLImageElement>((resolve, reject) => {
-          const img = new Image();
+          const img = document.createElement('img');
           img.onload = () => resolve(img);
           img.onerror = () => reject(new Error(`Failed to load ${url}`));
           img.src = url;
@@ -501,7 +501,7 @@ const PerformanceTestPage: React.FC = () => {
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-300">심각한 에러:</span>
                 <span className="font-medium text-red-600 dark:text-red-400">
-                  {errorStats.criticalErrors || 0}
+                  {errorStats.severityBreakdown?.critical || 0}
                 </span>
               </div>
               <div className="flex justify-between">

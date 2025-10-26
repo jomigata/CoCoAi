@@ -2,7 +2,7 @@
 interface CacheConfig {
   ttl: number; // Time to live in milliseconds
   maxSize: number; // Maximum number of cached items
-  strategy: 'memory' | 'indexeddb' | 'both';
+  strategy: 'memory' | 'indexeddb' | 'both' | 'cache-first' | 'network-first' | 'stale-while-revalidate';
 }
 
 interface CachedResponse<T = any> {
