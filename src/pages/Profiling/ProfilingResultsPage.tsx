@@ -22,6 +22,7 @@ import {
 // AI 경고 시스템 import
 import AIWarning from '@components/Common/AIWarning';
 import { useProfilingWarning } from '@hooks/useAIWarning';
+import LoadingSpinner from '@components/Common/LoadingSpinner';
 
 interface PersonalProfile {
   ageGroup: string;
@@ -41,7 +42,7 @@ interface PersonalProfile {
 }
 
 const ProfilingResultsPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   
   const [profile, setProfile] = useState<PersonalProfile | null>(null);
@@ -52,8 +53,10 @@ const ProfilingResultsPage: React.FC = () => {
   const aiWarning = useProfilingWarning();
 
   useEffect(() => {
-    loadProfile();
-  }, [user]);
+    if (!authLoading) {
+      loadProfile();
+    }
+  }, [user, authLoading]);
 
   const loadProfile = async () => {
     if (!user) {
@@ -62,20 +65,48 @@ const ProfilingResultsPage: React.FC = () => {
     }
 
     try {
+      setIsLoading(true);
       const userDoc = await getDoc(doc(db, 'users', user.uid));
+      
       if (userDoc.exists() && userDoc.data().personalProfile) {
-        setProfile(userDoc.data().personalProfile);
+        const profileData = userDoc.data().personalProfile;
+        setProfile(profileData);
       } else {
-        toast.error('프로파일링 결과를 찾을 수 없습니다.');
+        // 프로파일링 결과가 없는 경우
+        toast.error('프로파일링 결과를 찾을 수 없습니다. 먼저 프로파일링을 완료해주세요.');
         navigate('/profiling');
       }
     } catch (error) {
       console.error('프로필 로드 오류:', error);
       toast.error('프로필을 불러오는 중 오류가 발생했습니다.');
+      navigate('/profiling');
     } finally {
       setIsLoading(false);
     }
   };
+
+  // 인증 로딩 중
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-primary flex items-center justify-center">
+        <LoadingSpinner message="인증 상태를 확인하는 중..." />
+      </div>
+    );
+  }
+
+  // 프로필 로딩 중
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-primary flex items-center justify-center">
+        <LoadingSpinner message="프로파일을 불러오는 중..." />
+      </div>
+    );
+  }
+
+  // 프로필이 없는 경우 (이미 navigate로 처리됨)
+  if (!profile) {
+    return null;
+  }
 
   const getSelfEsteemLevel = (score: number): { level: string; color: string; description: string } => {
     if (score >= 80) {
@@ -186,39 +217,6 @@ const ProfilingResultsPage: React.FC = () => {
     // PDF 다운로드 기능 (추후 구현)
     toast.success('PDF 다운로드 기능은 곧 제공될 예정입니다.');
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-primary flex items-center justify-center">
-        <div className="text-center">
-          <div className="loading-spinner mx-auto mb-4" />
-          <p className="text-gray-600">프로파일을 불러오는 중...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-soft p-8 text-center">
-          <AlertTriangle className="w-16 h-16 text-orange-500 mx-auto mb-6" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            프로파일을 찾을 수 없습니다
-          </h2>
-          <p className="text-gray-600 mb-6">
-            먼저 개인 프로파일링을 완료해주세요.
-          </p>
-          <button
-            onClick={() => navigate('/profiling')}
-            className="btn-primary w-full"
-          >
-            프로파일링 시작하기
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const selfEsteemInfo = getSelfEsteemLevel(profile.profileData.selfEsteem);
   const recommendations = getRecommendations();
