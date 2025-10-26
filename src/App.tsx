@@ -33,6 +33,9 @@ const CounselorMatchingPage = lazy(() => import('@pages/Counseling/CounselorMatc
 const VideoCounselingPage = lazy(() => import('@pages/Counseling/VideoCounselingPage'));
 const PersonalGrowthPage = lazy(() => import('@pages/Growth/PersonalGrowthPage'));
 
+// 테스트 페이지들
+const PerformanceTestPage = lazy(() => import('@pages/Test/PerformanceTestPage'));
+
 // Phase 2: 소통 개선 도구 페이지들 - 동적 import
 const ConversationStarterPage = lazy(() => import('@pages/Communication/ConversationStarterPage'));
 const CommunicationPage = lazy(() => import('@pages/Communication/CommunicationPage'));
@@ -96,6 +99,9 @@ function App() {
                       <Route path="/counselor-matching" element={<CounselorMatchingPage />} />
                       <Route path="/counseling/video/:sessionId" element={<VideoCounselingPage />} />
                       <Route path="/growth" element={<PersonalGrowthPage />} />
+                      
+                      {/* 테스트 페이지 */}
+                      <Route path="/test/performance" element={<PerformanceTestPage />} />
                       
                       {/* Phase 2: 소통 개선 도구 */}
                       <Route path="/communication" element={<CommunicationPage />} />
