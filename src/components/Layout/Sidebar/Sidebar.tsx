@@ -16,7 +16,9 @@ import {
   TrendingUp,
   MessageSquare,
   BookOpen,
-  Gift
+  Gift,
+  Video,
+  UserCheck
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
@@ -32,7 +34,8 @@ const Sidebar: React.FC = () => {
     { name: '코코 챗봇', href: '/chat', icon: Bot },
     { name: '프로파일링', href: '/profiling', icon: Brain },
     { name: '마음 지도', href: '/mind-map', icon: Brain },
-    { name: '상담', href: '/counseling', icon: MessageCircle },
+    { name: '상담사 매칭', href: '/counselor-matching', icon: UserCheck },
+    { name: '화상 상담', href: '/counseling', icon: Video },
     { name: '프로필', href: '/profile', icon: User },
   ];
 

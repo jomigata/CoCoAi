@@ -29,7 +29,8 @@ const ChatPage = lazy(() => import('@pages/Chat/ChatPage'));
 const RecommendationsPage = lazy(() => import('@pages/Recommendations/RecommendationsPage'));
 const AchievementsPage = lazy(() => import('@pages/Achievements/AchievementsPage'));
 const RelationshipGardenPage = lazy(() => import('@pages/Garden/RelationshipGardenPage'));
-const CounselorMatchingPage = lazy(() => import('@pages/Counselor/CounselorMatchingPage'));
+const CounselorMatchingPage = lazy(() => import('@pages/Counseling/CounselorMatchingPage'));
+const VideoCounselingPage = lazy(() => import('@pages/Counseling/VideoCounselingPage'));
 const PersonalGrowthPage = lazy(() => import('@pages/Growth/PersonalGrowthPage'));
 
 // Phase 2: 소통 개선 도구 페이지들 - 동적 import
@@ -93,6 +94,7 @@ function App() {
                       <Route path="/achievements" element={<AchievementsPage />} />
                       <Route path="/garden" element={<RelationshipGardenPage />} />
                       <Route path="/counselor-matching" element={<CounselorMatchingPage />} />
+                      <Route path="/counseling/video/:sessionId" element={<VideoCounselingPage />} />
                       <Route path="/growth" element={<PersonalGrowthPage />} />
                       
                       {/* Phase 2: 소통 개선 도구 */}
