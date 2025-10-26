@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useAuth } from '@store/AuthContext';
 import { Star, Clock, Filter, Search, Users, Award } from 'lucide-react';
 import LoadingSpinner from '@components/Common/LoadingSpinner';
 import AIWarning from '@components/Common/AIWarning';

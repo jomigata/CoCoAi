@@ -180,10 +180,8 @@ const VideoCounselingPage: React.FC = () => {
     return (
       <VideoCall
         roomId={roomId}
-        userId={user.uid}
         userName={user.displayName || '사용자'}
         onCallEnd={endVideoCall}
-        isCounselor={false}
       />
     );
   }
