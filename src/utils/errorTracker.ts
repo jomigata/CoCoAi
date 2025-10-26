@@ -144,11 +144,12 @@ class ErrorTracker {
         
         return response;
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         this.handleError({
-          message: `Network request failed: ${error.message}`,
+          message: `Network request failed: ${errorMessage}`,
           url: args[0] as string,
           category: 'network',
-          metadata: { error: error.message }
+          metadata: { error: errorMessage }
         });
         throw error;
       }
@@ -234,7 +235,10 @@ class ErrorTracker {
     this.handleError({
       message,
       category: 'custom',
-      metadata,
+      metadata: {
+        ...metadata,
+        customSeverity: severity
+      },
       url: window.location.href
     });
   }

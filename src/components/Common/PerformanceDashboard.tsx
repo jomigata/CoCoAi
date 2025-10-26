@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Activity, AlertTriangle, Clock, Database, Wifi, Zap } from 'lucide-react';
 import { usePerformanceMonitor } from '@utils/performanceMonitor';
 import { useErrorTracker } from '@utils/errorTracker';
@@ -14,7 +14,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
 }) => {
   const { stats: perfStats } = usePerformanceMonitor();
   const { stats: errorStats } = useErrorTracker();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(showDetails);
 
   // 성능 점수 계산
   const calculatePerformanceScore = (): number => {
