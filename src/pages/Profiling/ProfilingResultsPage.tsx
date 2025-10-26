@@ -60,26 +60,77 @@ const ProfilingResultsPage: React.FC = () => {
 
   const loadProfile = async () => {
     if (!user) {
+      console.log('사용자가 로그인하지 않음, 로그인 페이지로 리다이렉트');
       navigate('/login');
       return;
     }
 
     try {
       setIsLoading(true);
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      console.log('프로필 로딩 시작, 사용자 ID:', user.uid);
       
-      if (userDoc.exists() && userDoc.data().personalProfile) {
-        const profileData = userDoc.data().personalProfile;
-        setProfile(profileData);
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      console.log('사용자 문서 존재 여부:', userDoc.exists());
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        console.log('사용자 데이터:', userData);
+        console.log('프로필 데이터 존재 여부:', !!userData.personalProfile);
+        
+        if (userData.personalProfile) {
+          const profileData = userData.personalProfile;
+          console.log('프로필 데이터:', profileData);
+          setProfile(profileData);
+        } else {
+          // 프로파일링 결과가 없는 경우 - 테스트용 더미 데이터 생성
+          console.log('프로파일링 결과가 없음, 테스트용 더미 데이터 생성');
+          const dummyProfile: PersonalProfile = {
+            ageGroup: '20-30',
+            completedAt: new Date(),
+            profileData: {
+              selfEsteem: 75,
+              stressCoping: ['운동하기', '음악 듣기', '친구와 대화하기'],
+              relationshipPattern: '외향적이고 사교적인 성격',
+              coreValues: ['가족', '건강', '성장', '자유'],
+              strengths: ['리더십', '창의성', '협력', '문제해결', '소통', '적응력']
+            },
+            mindMap: {
+              personality: 'ENFP (활동가)',
+              emotionalPattern: '긍정적이고 에너지가 넘치는',
+              communicationStyle: '열정적이고 표현력이 풍부한'
+            }
+          };
+          setProfile(dummyProfile);
+          toast.success('테스트용 프로필 데이터를 표시합니다.');
+        }
       } else {
-        // 프로파일링 결과가 없는 경우
-        toast.error('프로파일링 결과를 찾을 수 없습니다. 먼저 프로파일링을 완료해주세요.');
-        navigate('/profiling');
+        console.log('사용자 문서가 존재하지 않음');
+        toast.error('사용자 정보를 찾을 수 없습니다.');
+        navigate('/login');
       }
     } catch (error) {
       console.error('프로필 로드 오류:', error);
       toast.error('프로필을 불러오는 중 오류가 발생했습니다.');
-      navigate('/profiling');
+      
+      // 에러 발생 시에도 테스트용 더미 데이터 표시
+      const dummyProfile: PersonalProfile = {
+        ageGroup: '20-30',
+        completedAt: new Date(),
+        profileData: {
+          selfEsteem: 65,
+          stressCoping: ['독서하기', '산책하기', '명상하기'],
+          relationshipPattern: '내향적이지만 깊은 관계를 중시하는',
+          coreValues: ['진실', '성실', '평화', '지식'],
+          strengths: ['분석력', '집중력', '인내심', '신뢰성', '창의성', '공감능력']
+        },
+        mindMap: {
+          personality: 'INFP (중재자)',
+          emotionalPattern: '감성적이고 직관적인',
+          communicationStyle: '신중하고 의미 있는 대화를 선호하는'
+        }
+      };
+      setProfile(dummyProfile);
+      toast.success('오류 발생으로 테스트용 프로필 데이터를 표시합니다.');
     } finally {
       setIsLoading(false);
     }
@@ -87,6 +138,7 @@ const ProfilingResultsPage: React.FC = () => {
 
   // 인증 로딩 중
   if (authLoading) {
+    console.log('인증 로딩 중...');
     return (
       <div className="min-h-screen bg-gradient-primary flex items-center justify-center">
         <LoadingSpinner message="인증 상태를 확인하는 중..." />
@@ -96,6 +148,7 @@ const ProfilingResultsPage: React.FC = () => {
 
   // 프로필 로딩 중
   if (isLoading) {
+    console.log('프로필 로딩 중...');
     return (
       <div className="min-h-screen bg-gradient-primary flex items-center justify-center">
         <LoadingSpinner message="프로파일을 불러오는 중..." />
@@ -105,8 +158,11 @@ const ProfilingResultsPage: React.FC = () => {
 
   // 프로필이 없는 경우 (이미 navigate로 처리됨)
   if (!profile) {
+    console.log('프로필이 없음, null 반환');
     return null;
   }
+
+  console.log('프로필 렌더링 시작, 프로필 데이터:', profile);
 
   const getSelfEsteemLevel = (score: number): { level: string; color: string; description: string } => {
     if (score >= 80) {
