@@ -4,19 +4,8 @@ import toast from 'react-hot-toast';
 
 interface VideoCallProps {
   roomId: string;
-  userId: string;
   userName: string;
   onCallEnd: () => void;
-  isCounselor?: boolean;
-}
-
-interface Participant {
-  id: string;
-  name: string;
-  stream: MediaStream | null;
-  isVideoEnabled: boolean;
-  isAudioEnabled: boolean;
-  isCounselor: boolean;
 }
 
 const VideoCall: React.FC<VideoCallProps> = ({

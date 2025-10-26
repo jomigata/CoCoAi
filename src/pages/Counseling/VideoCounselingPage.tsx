@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@store/AuthContext';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Video, Phone, Users, Clock, Star, MessageCircle } from 'lucide-react';
+import { Video, Users, Clock, Star, MessageCircle } from 'lucide-react';
 import VideoCall from '@components/VideoCall/VideoCall';
 import LoadingSpinner from '@components/Common/LoadingSpinner';
 import AIWarning from '@components/Common/AIWarning';
@@ -49,7 +49,7 @@ const VideoCounselingPage: React.FC = () => {
   const [roomId, setRoomId] = useState<string>('');
 
   const aiWarning = useAIWarning({
-    analysisType: 'counseling',
+    analysisType: 'general',
     severity: 'high'
   });
 

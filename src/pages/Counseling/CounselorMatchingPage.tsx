@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '@store/AuthContext';
-import { Star, Clock, Filter, Search, Users, Award, Heart } from 'lucide-react';
+import { Star, Clock, Filter, Search, Users, Award } from 'lucide-react';
 import LoadingSpinner from '@components/Common/LoadingSpinner';
 import AIWarning from '@components/Common/AIWarning';
 import { useAIWarning } from '@hooks/useAIWarning';
@@ -40,9 +40,7 @@ interface MatchingCriteria {
 }
 
 const CounselorMatchingPage: React.FC = () => {
-  const { user } = useAuth();
   const [counselors, setCounselors] = useState<Counselor[]>([]);
-  const [filteredCounselors, setFilteredCounselors] = useState<Counselor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialization, setSelectedSpecialization] = useState<string[]>([]);
@@ -58,7 +56,7 @@ const CounselorMatchingPage: React.FC = () => {
   });
 
   const aiWarning = useAIWarning({
-    analysisType: 'counselor_matching',
+    analysisType: 'general',
     severity: 'medium'
   });
 
@@ -188,7 +186,6 @@ const CounselorMatchingPage: React.FC = () => {
       }));
 
       setCounselors(counselorsWithScore);
-      setFilteredCounselors(counselorsWithScore);
       
     } catch (error) {
       console.error('상담사 데이터 로드 오류:', error);
