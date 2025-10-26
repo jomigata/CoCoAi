@@ -220,6 +220,20 @@ class ErrorTracker {
   private determineSeverity(errorKey: string, count: number): ErrorReport['severity'] {
     const thresholds = this.config.severityThresholds;
     
+    // 에러 키에 따른 특별한 심각도 결정
+    if (errorKey.includes('critical') || errorKey.includes('fatal')) {
+      return 'critical';
+    }
+    
+    if (errorKey.includes('network') || errorKey.includes('timeout')) {
+      return count >= thresholds.high ? 'high' : 'medium';
+    }
+    
+    if (errorKey.includes('validation') || errorKey.includes('auth')) {
+      return count >= thresholds.medium ? 'medium' : 'low';
+    }
+    
+    // 기본 카운트 기반 심각도 결정
     if (count >= thresholds.critical) return 'critical';
     if (count >= thresholds.high) return 'high';
     if (count >= thresholds.medium) return 'medium';
